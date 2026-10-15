@@ -1,0 +1,4210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>万盛阻燃物料</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.6.2/css/select.bootstrap5.min.css">
+    <!-- FixedHeader CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.3.2/css/fixedHeader.bootstrap5.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #4a6491 100%);
+            color: white;
+            padding: 1.5rem 0;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.1;
+        }
+        
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+            border: none;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            border-bottom: 3px solid var(--secondary-color);
+            font-weight: 600;
+            color: var(--primary-color);
+            padding: 1.2rem 1.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #2980b9 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color) 0%, #219653 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(39, 174, 96, 0.3);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #e67e22 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #c0392b 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-primary {
+            border: 2px solid var(--secondary-color);
+            color: var(--secondary-color);
+            border-radius: 8px;
+            padding: 10px 24px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--secondary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .status-match {
+            color: var(--success-color);
+            font-weight: 600;
+            background-color: rgba(39, 174, 96, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        .status-mismatch {
+            color: var(--danger-color);
+            font-weight: 600;
+            background-color: rgba(231, 76, 60, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        .status-notfound {
+            color: var(--warning-color);
+            font-weight: 600;
+            background-color: rgba(243, 156, 18, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        .upload-area {
+            border: 3px dashed var(--secondary-color);
+            border-radius: 12px;
+            padding: 50px 30px;
+            text-align: center;
+            background-color: #f8fafc;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-area:hover {
+            background-color: #ebf5fb;
+            border-color: #2980b9;
+            transform: scale(1.01);
+        }
+        
+        .upload-area i {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .upload-area h5 {
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .upload-area p {
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+        
+        .contract-list-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            background-color: #fff;
+            transition: all 0.3s;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .contract-list-item:hover {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            border-left-color: var(--success-color);
+        }
+        
+        .result-summary {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            box-shadow: 0 6px 15px rgba(108, 92, 231, 0.2);
+        }
+        
+        .result-summary .display-4 {
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .result-summary small {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .loader {
+            display: none;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--secondary-color);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 40px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .badge-custom {
+            background: linear-gradient(135deg, var(--secondary-color), #2980b9);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .badge-success-custom {
+            background: linear-gradient(135deg, var(--success-color), #219653);
+        }
+        
+        .badge-warning-custom {
+            background: linear-gradient(135deg, var(--warning-color), #e67e22);
+        }
+        
+        .badge-danger-custom {
+            background: linear-gradient(135deg, var(--danger-color), #c0392b);
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            position: relative;
+        }
+        
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 22px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #e0e0e0;
+            z-index: 1;
+        }
+        
+        .step {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            flex: 1;
+        }
+        
+        .step-number {
+            width: 44px;
+            height: 44px;
+            background: #e0e0e0;
+            color: #666;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: 4px solid #fff;
+            transition: all 0.3s;
+        }
+        
+        .step.active .step-number {
+            background: var(--secondary-color);
+            color: white;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
+        }
+        
+        .step.completed .step-number {
+            background: var(--success-color);
+            color: white;
+            box-shadow: 0 4px 10px rgba(39, 174, 96, 0.4);
+        }
+        
+        .step-label {
+            font-size: 0.95rem;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .step.active .step-label {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+        
+        .step.completed .step-label {
+            color: var(--success-color);
+        }
+        
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        .dataTables_wrapper {
+            margin-top: 20px;
+        }
+        
+        /* 修复表头固定样式 */
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e0e0e0;
+            position: relative;
+        }
+        
+        /* 确保表头固定 */
+        .dataTables_wrapper .dataTables_scrollHead {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        
+        .dataTables_wrapper .dataTables_scrollHead .dataTables_scrollHeadInner {
+            width: 100% !important;
+        }
+        
+        .dataTables_wrapper .dataTables_scrollHead table {
+            margin-bottom: 0 !important;
+        }
+        
+        .table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: none;
+            font-weight: 600;
+            padding: 16px 12px;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        
+        .table tbody tr {
+            transition: all 0.2s;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .table tbody td {
+            padding: 14px 12px;
+            vertical-align: middle;
+        }
+        
+        /* 导航窗格 */
+        .navbar-container {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 250px;
+            background: linear-gradient(180deg, var(--primary-color) 0%, #1a2530 100%);
+            color: white;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+        
+        .navbar-container.collapsed {
+            transform: translateX(-250px);
+        }
+        
+        .navbar-toggle {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            z-index: 1001;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .navbar-toggle:hover {
+            background: #2980b9;
+            transform: scale(1.1);
+        }
+        
+        .navbar-toggle.collapsed {
+            left: 20px;
+        }
+        
+        .navbar-toggle.expanded {
+            left: 270px;
+        }
+        
+        .navbar-header {
+            padding: 25px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        
+        .navbar-header h4 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .navbar-menu {
+            padding: 20px 0;
+        }
+        
+        .nav-item {
+            padding: 0;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+            text-decoration: none;
+        }
+        
+        .nav-link:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-left-color: var(--secondary-color);
+        }
+        
+        .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--success-color);
+            font-weight: 500;
+        }
+        
+        .nav-link i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+        }
+        
+        .main-content.expanded {
+            margin-left: 0;
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            text-align: center;
+            border-top: 4px solid var(--secondary-color);
+        }
+        
+        .stats-card h3 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .stats-card p {
+            color: #6c757d;
+            margin: 0;
+            font-weight: 500;
+        }
+        
+        .alert-custom {
+            border-radius: 10px;
+            border: none;
+            padding: 15px 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        
+        .alert-info {
+            background-color: #e8f4fd;
+            border-left: 5px solid var(--secondary-color);
+            color: var(--primary-color);
+        }
+        
+        .alert-warning {
+            background-color: #fff8e6;
+            border-left: 5px solid var(--warning-color);
+            color: #856404;
+        }
+        
+        .material-detail-modal .modal-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #4a6491 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .material-detail-modal .modal-body {
+            padding: 25px;
+        }
+        
+        .material-detail-modal .table {
+            margin-bottom: 0;
+        }
+        
+        .material-detail-modal .table th {
+            background-color: #f8f9fa;
+            width: 30%;
+            font-weight: 600;
+        }
+        
+        .material-detail-modal .table td {
+            background-color: white;
+        }
+        
+        .price-highlight {
+            font-weight: 600;
+            color: var(--primary-color);
+            background-color: rgba(52, 152, 219, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        
+        .price-discrepancy {
+            font-weight: 600;
+            color: var(--danger-color);
+            background-color: rgba(231, 76, 60, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        
+        .supplier-select-card {
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .supplier-select-card:hover {
+            border-color: var(--secondary-color);
+            background-color: #f8fafc;
+            transform: translateY(-3px);
+        }
+        
+        .supplier-select-card.selected {
+            border-color: var(--success-color);
+            background-color: rgba(39, 174, 96, 0.05);
+        }
+        
+        .supplier-select-card h5 {
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .supplier-select-card .badge {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .floating-action-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #2980b9 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+            z-index: 100;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .floating-action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.6);
+        }
+        
+        .footer {
+            background-color: var(--primary-color);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 25px 0;
+            margin-top: 40px;
+            text-align: center;
+        }
+        
+        .footer p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        
+        .footer a {
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 1200px) {
+            .navbar-container {
+                width: 220px;
+            }
+            
+            .main-content {
+                margin-left: 220px;
+            }
+            
+            .navbar-toggle.expanded {
+                left: 240px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .navbar-container {
+                transform: translateX(-250px);
+            }
+            
+            .navbar-container.expanded {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .navbar-toggle {
+                left: 20px;
+            }
+            
+            .navbar-toggle.expanded {
+                left: 270px;
+            }
+            
+            .step-indicator {
+                flex-wrap: wrap;
+            }
+            
+            .step {
+                flex: 0 0 50%;
+                margin-bottom: 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .step {
+                flex: 0 0 100%;
+            }
+            
+            .result-summary .row > div {
+                margin-bottom: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .upload-area {
+                padding: 30px 20px;
+            }
+            
+            .upload-area i {
+                font-size: 2.5rem;
+            }
+        }
+        
+        /* 新增样式 */
+        .search-box {
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            background-color: #fff;
+            margin-bottom: 20px;
+        }
+        
+        .search-box .input-group {
+            margin-bottom: 10px;
+        }
+        
+        .search-results {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .contract-export-options {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .material-search-result {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+        }
+        
+        .material-search-result:hover {
+            background-color: #e9ecef;
+        }
+        
+        /* 历史记录样式 */
+        .history-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            background-color: #fff;
+            transition: all 0.3s;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .history-item:hover {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+        
+        .history-item.match {
+            border-left-color: var(--success-color);
+        }
+        
+        .history-item.mismatch {
+            border-left-color: var(--warning-color);
+        }
+        
+        .history-item.notfound {
+            border-left-color: var(--danger-color);
+        }
+        
+        .history-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 10px 0;
+        }
+        
+        .history-stat {
+            text-align: center;
+        }
+        
+        .history-stat .number {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .history-stat .label {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        /* 历史记录详情样式 */
+        .history-detail-modal .modal-dialog {
+            max-width: 90%;
+        }
+        
+        .history-detail-modal .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航窗格 -->
+    <div class="navbar-container" id="navbarContainer">
+        <div class="navbar-header">
+            <h4><i class="bi bi-columns-gap me-2"></i>系统导航</h4>
+        </div>
+        <div class="navbar-menu">
+            <div class="nav-item">
+                <a href="#step1-card" class="nav-link active" data-step="1">
+                    <i class="bi bi-folder-check"></i> 合同管理
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#step2-card" class="nav-link" data-step="2">
+                    <i class="bi bi-building"></i> 供应商选择
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#step3-card" class="nav-link" data-step="3">
+                    <i class="bi bi-calculator"></i> 对账单核价
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#step4-card" class="nav-link" data-step="4">
+                    <i class="bi bi-graph-up"></i> 核价结果
+                </a>
+            </div>
+            <div class="nav-item mt-4">
+                <a href="#" class="nav-link" id="showAllMaterials">
+                    <i class="bi bi-search"></i> 物料明细查询
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link" id="showContractStats">
+                    <i class="bi bi-bar-chart"></i> 合同统计
+                </a>
+            </div>
+            <!-- 新增历史记录导航 -->
+            <div class="nav-item">
+                <a href="#" class="nav-link" id="showHistory">
+                    <i class="bi bi-clock-history"></i> 核价历史记录
+                </a>
+            </div>
+            <div class="nav-item mt-4">
+                <a href="#" class="nav-link" id="clearAllData">
+                    <i class="bi bi-trash"></i> 清除所有数据
+                </a>
+            </div>
+        </div>
+        <div class="mt-auto p-3 text-center">
+            <small>© 2026 物料合同核价系统</small>
+        </div>
+    </div>
+    
+    <!-- 导航切换按钮 -->
+    <div class="navbar-toggle" id="navbarToggle">
+        <i class="bi bi-list"></i>
+    </div>
+    
+    <!-- 主要内容区 -->
+    <div class="main-content" id="mainContent">
+        <!-- 头部 -->
+        <div class="header">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1><i class="bi bi-file-earmark-spreadsheet me-2"></i> 物料合同核价系统</h1>
+                        <p class="lead mb-0">智能合同管理 · 自动核价比对 · 多维度分析</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="badge bg-light text-dark p-2">
+                            <i class="bi bi-clock"></i> <span id="current-time"></span>
+                        </div>
+                        <div class="mt-2">
+                            <span class="badge bg-success" id="contractCountBadge">0个合同</span>
+                            <span class="badge bg-warning" id="supplierCountBadge">0个供应商</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 步骤指示器 -->
+        <div class="container">
+            <div class="step-indicator">
+                <div class="step active" id="step1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">上传合同</div>
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">选择供应商</div>
+                </div>
+                <div class="step" id="step3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">上传对账单</div>
+                </div>
+                <div class="step" id="step4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">查看结果</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 第一步：合同管理 -->
+        <div class="container" id="step1-container">
+            <div class="card" id="step1-card">
+                <div class="card-header">
+                    <i class="bi bi-folder-check me-2"></i> 第一步：上传供应商合同
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info alert-custom">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>合同格式说明：</strong> Excel文件应包含以下列：合同编号(A列)、序号(B列)、物料编码(C列)、物料名称(D列)、单位(E列)、未税单价(F列，4位小数)、含税单价(G列，2位小数)。每个Sheet代表一个供应商，Sheet名称为供应商名称。
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5>合同管理功能</h5>
+                                <div>
+                                    <button class="btn btn-primary me-2" id="addSupplierContractBtn">
+                                        <i class="bi bi-plus-circle me-2"></i>添加供应商合同
+                                    </button>
+                                    <button class="btn btn-secondary" id="exportContractsBtn" disabled>
+                                        <i class="bi bi-download me-2"></i>导出合同
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="upload-area" id="contractUploadArea">
+                                <i class="bi bi-cloud-arrow-up-fill" style="color: #3498db;"></i>
+                                <h5 class="mt-3">拖放或点击上传合同文件</h5>
+                                <p class="text-muted mb-3">支持Excel格式(.xlsx, .xls)，每个Sheet代表一个供应商，最大文件大小：10MB</p>
+                                <button class="btn btn-primary" onclick="document.getElementById('contractFile').click()">
+                                    <i class="bi bi-upload me-2"></i>选择文件
+                                </button>
+                                <input type="file" id="contractFile" accept=".xlsx,.xls" class="d-none" multiple>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <h3 id="totalMaterialsCount">0</h3>
+                                <p>总物料数量</p>
+                            </div>
+                            <div class="stats-card">
+                                <h3 id="totalSuppliersCount">0</h3>
+                                <p>供应商数量</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5><i class="bi bi-list-check me-2"></i>已上传的合同文件</h5>
+                            <div>
+                                <button class="btn btn-outline-info me-2" id="viewAllMaterials">
+                                    <i class="bi bi-search me-2"></i>查看所有物料明细
+                                </button>
+                                <button class="btn btn-outline-danger" id="clearContracts" disabled>
+                                    <i class="bi bi-trash me-2"></i>清除所有合同
+                                </button>
+                            </div>
+                        </div>
+                        <div id="contractList" class="mb-3">
+                            <p class="text-muted">暂无上传的合同文件</p>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-success" id="nextToStep2" disabled>
+                                下一步：选择供应商 <i class="bi bi-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 第二步：选择供应商 -->
+        <div class="container" id="step2-container" style="display: none;">
+            <div class="card" id="step2-card">
+                <div class="card-header">
+                    <i class="bi bi-building me-2"></i> 第二步：选择供应商
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="alert alert-warning alert-custom">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <strong>选择说明：</strong> 请选择一个供应商进行核价。系统将在该供应商的合同中查找物料信息进行比对。
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row" id="supplierSelectionGrid">
+                        <!-- 供应商卡片将在这里动态生成 -->
+                    </div>
+                    
+                    <div class="row mt-4" id="selectedSupplierDetails" style="display: none;">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <i class="bi bi-info-square me-2"></i> 已选择供应商详情
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 id="selectedSupplierName">供应商名称</h5>
+                                            <div class="mt-3">
+                                                <span class="badge-custom me-2" id="selectedContractCount">0个合同</span>
+                                                <span class="badge-custom badge-success-custom" id="selectedMaterialCount">0个物料</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>合同列表：</h6>
+                                            <div id="selectedContractList" class="border rounded p-2" style="max-height: 150px; overflow-y: auto;">
+                                                <!-- 合同列表将在这里动态生成 -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <button class="btn btn-outline-secondary" id="backToStep1">
+                            <i class="bi bi-arrow-left me-2"></i>上一步：上传合同
+                        </button>
+                        <button class="btn btn-success" id="nextToStep3" disabled>
+                            下一步：上传对账单 <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 第三步：上传对账单 -->
+        <div class="container" id="step3-container" style="display: none;">
+            <div class="card" id="step3-card">
+                <div class="card-header">
+                    <i class="bi bi-calculator me-2"></i> 第三步：上传对账单
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="alert alert-info alert-custom">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6><i class="bi bi-building me-2"></i> 当前供应商</h6>
+                                        <h4 id="currentSupplierName" class="text-primary">未选择</h4>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6><i class="bi bi-file-earmark-text me-2"></i> 合同信息</h6>
+                                        <p class="mb-1">合同数量: <span id="currentContractCount" class="badge-custom">0</span></p>
+                                        <p>物料数量: <span id="currentMaterialCount" class="badge-custom badge-success-custom">0</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="alert alert-warning alert-custom">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <strong>对账单格式说明：</strong> 对账单应包含序号(A列)、入库日期（B列）、入库单号（C列），物料编码(D列)、物料名称（E列）、数量（F列）和未税单价(G列，4位小数)、含税单价(H列，2位小数)、价税合计（I列）等信息。系统将自动匹配物料编码对含税单价进行核价。
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="upload-area" id="invoiceUploadArea">
+                                <i class="bi bi-file-earmark-excel-fill" style="color: #27ae60;"></i>
+                                <h5 class="mt-3">上传对账单Excel文件</h5>
+                                <p class="text-muted mb-3">系统将自动核价并生成报告</p>
+                                <button class="btn btn-success" id="invoiceFileBtn">
+                                    <i class="bi bi-upload me-2"></i>选择对账单文件
+                                </button>
+                                <input type="file" id="invoiceFile" accept=".xlsx,.xls" class="d-none">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <h3 id="expectedMatches">0</h3>
+                                <p>预计匹配物料</p>
+                            </div>
+                            <div class="stats-card">
+                                <h3 id="verificationTime">0s</h3>
+                                <p>预计核价时间</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="loader" id="loadingSpinner"></div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <button class="btn btn-outline-secondary" id="backToStep2">
+                            <i class="bi bi-arrow-left me-2"></i>上一步：选择供应商
+                        </button>
+                        <button class="btn btn-primary" id="startVerify" disabled>
+                            <i class="bi bi-play-circle me-2"></i>开始核价
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 第四步：核价结果 -->
+        <div class="container" id="step4-container" style="display: none;">
+            <div class="card" id="step4-card">
+                <div class="card-header">
+                    <i class="bi bi-graph-up me-2"></i> 第四步：核价结果
+                </div>
+                <div class="card-body">
+                    <div class="result-summary" id="resultSummary">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="display-4 fw-bold" id="totalCount">0</div>
+                                <small>总物料数</small>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="display-4 fw-bold status-match" id="matchCount">0</div>
+                                <small>单价一致</small>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="display-4 fw-bold status-mismatch" id="mismatchCount">0</div>
+                                <small>单价不一致</small>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="display-4 fw-bold status-notfound" id="notfoundCount">0</div>
+                                <small>未找到合同</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table id="resultTable" class="table table-hover table-striped" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>物料编码</th>
+                                    <th>物料名称</th>
+                                    <th>对账单单价</th>
+                                    <th>合同单价</th>
+                                    <th>合同编号-序号</th>
+                                    <th>核价结果</th>
+                                    <th>差额</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 数据将通过DataTables动态加载 -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-4 d-flex justify-content-between" id="exportButtons">
+                        <div>
+                            <button class="btn btn-success" id="exportExcel">
+                                <i class="bi bi-file-earmark-excel me-2"></i>导出Excel
+                            </button>
+                            <button class="btn btn-danger" id="exportPDF">
+                                <i class="bi bi-file-earmark-excel me-2"></i>导出横向Excel
+                            </button>
+                            <button class="btn btn-info" id="exportSummary">
+                                <i class="bi bi-file-earmark-excel me-2"></i>导出汇总Excel
+                            </button>
+                        </div>
+                        <div>
+                            <button class="btn btn-outline-primary" id="backToStep3">
+                                <i class="bi bi-arrow-left me-2"></i>重新核价
+                            </button>
+                            <button class="btn btn-primary" id="newVerification">
+                                <i class="bi bi-plus-circle me-2"></i>新核价任务
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 浮动操作按钮 -->
+        <div class="floating-action-btn" id="floatingActionBtn" data-bs-toggle="tooltip" title="快速操作">
+            <i class="bi bi-lightning-fill"></i>
+        </div>
+        
+        <!-- 页脚 -->
+        <div class="footer">
+            <div class="container">
+                <p>© 2026 物料合同核价系统 | 版本 2.1 | 技术支持: <a href="mailto:dongxinyu522@gmail.com">dongxinyu522@gmail.com</a></p>
+                <p class="mt-2"><small>本系统用于物料合同与对账单的自动核价比对，提高工作效率和准确性</small></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 消息通知容器 -->
+    <div class="toast-container"></div>
+    
+    <!-- 物料明细查询模态框 -->
+    <div class="modal fade" id="allMaterialsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header material-detail-modal">
+                    <h5 class="modal-title"><i class="bi bi-search me-2"></i>物料明细查询</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="search-box">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="searchMaterialCode" class="form-label">物料编码</label>
+                                    <input type="text" class="form-control" id="searchMaterialCode" placeholder="输入物料编码">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="searchMaterialName" class="form-label">物料名称</label>
+                                    <input type="text" class="form-control" id="searchMaterialName" placeholder="输入物料名称">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="searchSupplier" class="form-label">供应商</label>
+                                    <select class="form-control" id="searchSupplier">
+                                        <option value="">全部供应商</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-secondary me-2" id="clearSearch">
+                                <i class="bi bi-x-circle me-2"></i>清除
+                            </button>
+                            <button class="btn btn-primary" id="searchMaterials">
+                                <i class="bi bi-search me-2"></i>搜索
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table id="allMaterialsTable" class="table table-hover" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>物料编码</th>
+                                    <th>物料名称</th>
+                                    <th>供应商</th>
+                                    <th>合同编号</th>
+                                    <th>序号</th>
+                                    <th>未税单价</th>
+                                    <th>含税单价</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 数据将通过DataTables动态加载 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 合同统计模态框 -->
+    <div class="modal fade" id="contractStatsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header material-detail-modal">
+                    <h5 class="modal-title"><i class="bi bi-bar-chart me-2"></i>合同统计信息</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="stats-card">
+                                <h3 id="statsTotalSuppliers">0</h3>
+                                <p>供应商总数</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stats-card">
+                                <h3 id="statsTotalContracts">0</h3>
+                                <p>合同总数</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <h5>各供应商物料数量</h5>
+                            <div id="supplierStatsChart" style="height: 300px; width: 100%;">
+                                <!-- 图表将在这里动态生成 -->
+                                <canvas id="supplierChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <h5>供应商详情</h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>供应商</th>
+                                            <th>合同数量</th>
+                                            <th>物料数量</th>
+                                            <th>含税单价范围</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="supplierStatsBody">
+                                        <!-- 数据将动态加载 -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 浮动操作菜单 -->
+    <div class="modal fade" id="quickActionsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">快速操作</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="list-group">
+                        <a href="#" class="list-group-item list-group-item-action" id="quickUploadContract">
+                            <i class="bi bi-upload me-2"></i>上传合同
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" id="quickSearchMaterial">
+                            <i class="bi bi-search me-2"></i>查询物料
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" id="quickNewVerification">
+                            <i class="bi bi-plus-circle me-2"></i>新建核价
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" id="quickExport">
+                            <i class="bi bi-download me-2"></i>导出数据
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" id="quickClearData">
+                            <i class="bi bi-trash me-2"></i>清除数据
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加供应商合同模态框 -->
+    <div class="modal fade" id="addSupplierContractModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>添加供应商合同</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="supplierNameInput" class="form-label">供应商名称</label>
+                        <input type="text" class="form-control" id="supplierNameInput" placeholder="输入供应商名称">
+                    </div>
+                    <div class="mb-3">
+                        <label for="contractFileSelect" class="form-label">选择合同文件</label>
+                        <input type="file" class="form-control" id="contractFileSelect" accept=".xlsx,.xls">
+                    </div>
+                    <div class="alert alert-info">
+                        <small><i class="bi bi-info-circle me-2"></i>Excel文件应包含以下列：合同编号(A列)、序号(B列)、物料编码(C列)、物料名称(D列)、单位(E列)、未税单价(F列，4位小数)、含税单价(G列，2位小数)</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="confirmAddContract">添加合同</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 导出合同选择模态框 -->
+    <div class="modal fade" id="exportContractsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-download me-2"></i>导出合同</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="contract-export-options">
+                        <label class="form-label">选择导出范围</label>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exportOption" id="exportAll" value="all" checked>
+                            <label class="form-check-label" for="exportAll">
+                                导出所有供应商合同
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exportOption" id="exportSelected" value="selected">
+                            <label class="form-check-label" for="exportSelected">
+                                选择供应商导出
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="exportOption" id="exportSingle" value="single">
+                            <label class="form-check-label" for="exportSingle">
+                                导出单个供应商合同
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div id="supplierSelectionExport" style="display: none; max-height: 300px; overflow-y: auto;">
+                        <div class="list-group" id="exportSupplierList">
+                            <!-- 供应商列表将动态生成 -->
+                        </div>
+                    </div>
+                    
+                    <div id="singleSupplierExport" style="display: none;">
+                        <label for="singleSupplierSelect" class="form-label">选择供应商</label>
+                        <select class="form-select" id="singleSupplierSelect">
+                            <option value="">请选择供应商</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="confirmExport">导出</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 核价历史记录模态框 -->
+    <div class="modal fade history-detail-modal" id="historyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header material-detail-modal">
+                    <h5 class="modal-title"><i class="bi bi-clock-history me-2"></i>核价历史记录</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info alert-custom mb-3">
+                        <i class="bi bi-info-circle me-2"></i>
+                        系统自动保存每次核价记录，最多保存最近50条记录。点击记录可查看详情。
+                    </div>
+                    
+                    <div id="historyList" class="mb-3">
+                        <p class="text-muted text-center">暂无核价历史记录</p>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-outline-danger" id="clearHistory">
+                            <i class="bi bi-trash me-2"></i>清空历史记录
+                        </button>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 历史记录详情模态框 -->
+    <div class="modal fade history-detail-modal" id="historyDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header material-detail-modal">
+                    <h5 class="modal-title"><i class="bi bi-file-earmark-text me-2"></i>核价历史详情</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <h6><i class="bi bi-building me-2"></i> 供应商</h6>
+                            <h4 id="historySupplierName" class="text-primary">未指定</h4>
+                        </div>
+                        <div class="col-md-4">
+                            <h6><i class="bi bi-calendar me-2"></i> 核价时间</h6>
+                            <h4 id="historyVerificationDate" class="text-primary">未指定</h4>
+                        </div>
+                        <div class="col-md-4">
+                            <h6><i class="bi bi-file-earmark me-2"></i> 对账单</h6>
+                            <h4 id="historyInvoiceFile" class="text-primary">未指定</h4>
+                        </div>
+                    </div>
+                    
+                    <div class="result-summary mb-4" id="historyResultSummary">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="display-4 fw-bold" id="historyTotalCount">0</div>
+                                <small>总物料数</small>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="display-4 fw-bold status-match" id="historyMatchCount">0</div>
+                                <small>单价一致</small>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="display-4 fw-bold status-mismatch" id="historyMismatchCount">0</div>
+                                <small>单价不一致</small>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="display-4 fw-bold status-notfound" id="historyNotfoundCount">0</div>
+                                <small>未找到合同</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table id="historyDetailTable" class="table table-hover table-striped" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>物料编码</th>
+                                    <th>物料名称</th>
+                                    <th>对账单单价</th>
+                                    <th>合同单价</th>
+                                    <th>合同编号-序号</th>
+                                    <th>核价结果</th>
+                                    <th>差额</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 数据将通过DataTables动态加载 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chart.js 用于统计图表 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- 脚本引入 -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- DataTables 相关脚本 -->
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.colVis.min.js"></script>
+    <script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+    
+    <!-- FixedHeader 插件 -->
+    <script src="https://cdn.datatables.net/fixedheader/3.3.2/js/dataTables.fixedHeader.min.js"></script>
+    
+    <!-- SheetJS 用于Excel处理 -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    
+    <script>
+        // 全局变量
+        let contracts = {};
+        let currentSupplier = '';
+        let currentResults = [];
+        let dataTable = null;
+        let allMaterialsTable = null;
+        let supplierChart = null;
+        let isNavbarExpanded = false;
+        let verificationHistory = []; // 核价历史记录
+        
+        // DOM元素
+        const navbarContainer = document.getElementById('navbarContainer');
+        const navbarToggle = document.getElementById('navbarToggle');
+        const mainContent = document.getElementById('mainContent');
+        const contractFileInput = document.getElementById('contractFile');
+        const contractUploadArea = document.getElementById('contractUploadArea');
+        const contractList = document.getElementById('contractList');
+        const clearContractsBtn = document.getElementById('clearContracts');
+        const nextToStep2Btn = document.getElementById('nextToStep2');
+        const nextToStep3Btn = document.getElementById('nextToStep3');
+        const startVerifyBtn = document.getElementById('startVerify');
+        const backToStep1Btn = document.getElementById('backToStep1');
+        const backToStep2Btn = document.getElementById('backToStep2');
+        const backToStep3Btn = document.getElementById('backToStep3');
+        const newVerificationBtn = document.getElementById('newVerification');
+        const viewAllMaterialsBtn = document.getElementById('viewAllMaterials');
+        const showAllMaterialsNav = document.getElementById('showAllMaterials');
+        const showContractStatsNav = document.getElementById('showContractStats');
+        const showHistoryNav = document.getElementById('showHistory'); // 历史记录导航
+        const clearAllDataNav = document.getElementById('clearAllData');
+        
+        // 步骤指示器元素
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const step4 = document.getElementById('step4');
+        
+        // 步骤容器元素
+        const step1Container = document.getElementById('step1-container');
+        const step2Container = document.getElementById('step2-container');
+        const step3Container = document.getElementById('step3-container');
+        const step4Container = document.getElementById('step4-container');
+        
+        // 统计元素
+        const totalMaterialsCountEl = document.getElementById('totalMaterialsCount');
+        const totalSuppliersCountEl = document.getElementById('totalSuppliersCount');
+        const contractCountBadge = document.getElementById('contractCountBadge');
+        const supplierCountBadge = document.getElementById('supplierCountBadge');
+        const selectedSupplierNameEl = document.getElementById('selectedSupplierName');
+        const selectedContractCountEl = document.getElementById('selectedContractCount');
+        const selectedMaterialCountEl = document.getElementById('selectedMaterialCount');
+        const selectedContractListEl = document.getElementById('selectedContractList');
+        const currentSupplierNameEl = document.getElementById('currentSupplierName');
+        const currentContractCountEl = document.getElementById('currentContractCount');
+        const currentMaterialCountEl = document.getElementById('currentMaterialCount');
+        
+        // 上传相关元素
+        const invoiceFileInput = document.getElementById('invoiceFile');
+        const invoiceUploadArea = document.getElementById('invoiceUploadArea');
+        const invoiceFileBtn = document.getElementById('invoiceFileBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        
+        // 结果相关元素
+        const resultSummary = document.getElementById('resultSummary');
+        const exportButtons = document.getElementById('exportButtons');
+        const totalCountEl = document.getElementById('totalCount');
+        const matchCountEl = document.getElementById('matchCount');
+        const mismatchCountEl = document.getElementById('mismatchCount');
+        const notfoundCountEl = document.getElementById('notfoundCount');
+        
+        // 导出按钮
+        const exportExcelBtn = document.getElementById('exportExcel');
+        const exportPDFBtn = document.getElementById('exportPDF');
+        const exportSummaryBtn = document.getElementById('exportSummary');
+        
+        // 浮动操作按钮
+        const floatingActionBtn = document.getElementById('floatingActionBtn');
+        
+        // 新功能元素
+        const addSupplierContractBtn = document.getElementById('addSupplierContractBtn');
+        const exportContractsBtn = document.getElementById('exportContractsBtn');
+        const confirmAddContractBtn = document.getElementById('confirmAddContract');
+        const confirmExportBtn = document.getElementById('confirmExport');
+        
+        // 物料搜索元素
+        const searchMaterialsBtn = document.getElementById('searchMaterials');
+        const clearSearchBtn = document.getElementById('clearSearch');
+        const searchMaterialCodeInput = document.getElementById('searchMaterialCode');
+        const searchMaterialNameInput = document.getElementById('searchMaterialName');
+        const searchSupplierSelect = document.getElementById('searchSupplier');
+        
+        // 历史记录元素
+        const clearHistoryBtn = document.getElementById('clearHistory');
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 显示当前时间
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+            
+            // 初始化事件监听
+            initEventListeners();
+            
+            // 从本地存储加载数据
+            loadFromLocalStorage();
+            
+            // 初始化工具提示
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // 初始化导出选项监听
+            document.querySelectorAll('input[name="exportOption"]').forEach(radio => {
+                radio.addEventListener('change', handleExportOptionChange);
+            });
+        });
+        
+        // 更新当前时间
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            document.getElementById('current-time').textContent = timeString;
+        }
+        
+        // 初始化事件监听
+        function initEventListeners() {
+            // 导航切换
+            navbarToggle.addEventListener('click', toggleNavbar);
+            
+            // 导航链接点击
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (this.getAttribute('href').startsWith('#')) {
+                        e.preventDefault();
+                        const step = this.getAttribute('data-step');
+                        goToStep(parseInt(step));
+                        
+                        // 更新导航链接激活状态
+                        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                        this.classList.add('active');
+                    }
+                });
+            });
+            
+            // 修复步骤导航按钮
+            nextToStep2Btn.addEventListener('click', () => goToStep(2));
+            nextToStep3Btn.addEventListener('click', () => goToStep(3));
+            startVerifyBtn.addEventListener('click', startVerification);
+            backToStep1Btn.addEventListener('click', () => goToStep(1));
+            backToStep2Btn.addEventListener('click', () => goToStep(2));
+            backToStep3Btn.addEventListener('click', () => goToStep(3));
+            newVerificationBtn.addEventListener('click', newVerification);
+            
+            // 合同上传 - 修复点击两次的问题
+            contractUploadArea.addEventListener('click', () => contractFileInput.click());
+            contractFileInput.addEventListener('change', handleContractUpload);
+            
+            // 对账单上传 - 修复点击两次的问题
+            invoiceFileBtn.addEventListener('click', () => invoiceFileInput.click());
+            invoiceFileInput.addEventListener('change', handleInvoiceFileSelect);
+            
+            // 按钮事件
+            clearContractsBtn.addEventListener('click', clearAllContracts);
+            viewAllMaterialsBtn.addEventListener('click', showAllMaterials);
+            
+            // 修复物料明细查询
+            showAllMaterialsNav.addEventListener('click', function(e) {
+                e.preventDefault();
+                showAllMaterials();
+            });
+            
+            // 修复合同统计
+            showContractStatsNav.addEventListener('click', function(e) {
+                e.preventDefault();
+                showContractStats();
+            });
+            
+            // 历史记录
+            showHistoryNav.addEventListener('click', function(e) {
+                e.preventDefault();
+                showHistory();
+            });
+            
+            clearAllDataNav.addEventListener('click', function(e) {
+                e.preventDefault();
+                clearAllContracts();
+            });
+            
+            // 导出按钮事件
+            exportExcelBtn.addEventListener('click', exportToExcel);
+            exportPDFBtn.addEventListener('click', exportToExcelHorizontal);
+            exportSummaryBtn.addEventListener('click', exportSummaryExcel);
+            
+            // 浮动操作按钮
+            floatingActionBtn.addEventListener('click', showQuickActions);
+            
+            // 快速操作菜单事件
+            document.getElementById('quickUploadContract').addEventListener('click', function(e) {
+                e.preventDefault();
+                contractFileInput.click();
+                bootstrap.Modal.getInstance(document.getElementById('quickActionsModal')).hide();
+            });
+            
+            document.getElementById('quickSearchMaterial').addEventListener('click', function(e) {
+                e.preventDefault();
+                showAllMaterials();
+                bootstrap.Modal.getInstance(document.getElementById('quickActionsModal')).hide();
+            });
+            
+            document.getElementById('quickNewVerification').addEventListener('click', function(e) {
+                e.preventDefault();
+                newVerification();
+                bootstrap.Modal.getInstance(document.getElementById('quickActionsModal')).hide();
+            });
+            
+            document.getElementById('quickExport').addEventListener('click', function(e) {
+                e.preventDefault();
+                if (currentResults.length > 0) {
+                    exportToExcel();
+                } else {
+                    showToast('warning', '没有可导出的数据');
+                }
+                bootstrap.Modal.getInstance(document.getElementById('quickActionsModal')).hide();
+            });
+            
+            document.getElementById('quickClearData').addEventListener('click', function(e) {
+                e.preventDefault();
+                clearAllContracts();
+                bootstrap.Modal.getInstance(document.getElementById('quickActionsModal')).hide();
+            });
+            
+            // 新功能事件监听
+            addSupplierContractBtn.addEventListener('click', showAddSupplierContractModal);
+            exportContractsBtn.addEventListener('click', showExportContractsModal);
+            confirmAddContractBtn.addEventListener('click', handleAddSupplierContract);
+            confirmExportBtn.addEventListener('click', handleExportContracts);
+            
+            // 物料搜索事件监听
+            searchMaterialsBtn.addEventListener('click', searchMaterials);
+            clearSearchBtn.addEventListener('click', clearSearch);
+            
+            // 历史记录事件监听
+            clearHistoryBtn.addEventListener('click', clearHistory);
+            
+            // 拖拽上传
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                contractUploadArea.addEventListener(eventName, preventDefaults, false);
+                invoiceUploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                contractUploadArea.addEventListener(eventName, highlightArea, false);
+                invoiceUploadArea.addEventListener(eventName, highlightArea, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                contractUploadArea.addEventListener(eventName, unhighlightArea, false);
+                invoiceUploadArea.addEventListener(eventName, unhighlightArea, false);
+            });
+            
+            contractUploadArea.addEventListener('drop', handleDropContract, false);
+            invoiceUploadArea.addEventListener('drop', handleDropInvoice, false);
+        }
+        
+        // 切换导航窗格
+        function toggleNavbar() {
+            if (window.innerWidth < 992) {
+                // 在小屏幕上，切换展开/收起状态
+                isNavbarExpanded = !isNavbarExpanded;
+                if (isNavbarExpanded) {
+                    navbarContainer.classList.add('expanded');
+                    navbarToggle.classList.add('expanded');
+                    navbarToggle.innerHTML = '<i class="bi bi-x"></i>';
+                } else {
+                    navbarContainer.classList.remove('expanded');
+                    navbarToggle.classList.remove('expanded');
+                    navbarToggle.innerHTML = '<i class="bi bi-list"></i>';
+                }
+            } else {
+                // 在大屏幕上，切换固定状态
+                isNavbarExpanded = !isNavbarExpanded;
+                if (isNavbarExpanded) {
+                    navbarContainer.classList.add('collapsed');
+                    mainContent.classList.add('expanded');
+                    navbarToggle.classList.add('collapsed');
+                    navbarToggle.innerHTML = '<i class="bi bi-chevron-right"></i>';
+                } else {
+                    navbarContainer.classList.remove('collapsed');
+                    mainContent.classList.remove('expanded');
+                    navbarToggle.classList.remove('collapsed');
+                    navbarToggle.innerHTML = '<i class="bi bi-chevron-left"></i>';
+                }
+            }
+        }
+        
+        // 防止默认行为
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        // 高亮上传区域
+        function highlightArea(e) {
+            e.currentTarget.style.borderColor = '#2980b9';
+            e.currentTarget.style.backgroundColor = '#ebf5fb';
+        }
+        
+        // 取消高亮上传区域
+        function unhighlightArea(e) {
+            e.currentTarget.style.borderColor = '#3498db';
+            e.currentTarget.style.backgroundColor = '#f8fafc';
+        }
+        
+        // 处理合同文件拖放
+        function handleDropContract(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            contractFileInput.files = files;
+            handleContractUpload();
+        }
+        
+        // 处理对账单文件拖放
+        function handleDropInvoice(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            invoiceFileInput.files = files;
+            handleInvoiceFileSelect();
+        }
+        
+        // 处理合同文件上传
+        function handleContractUpload() {
+            const files = contractFileInput.files;
+            if (files.length === 0) return;
+            
+            loadingSpinner.style.display = 'block';
+            
+            // 处理多个文件
+            let processedCount = 0;
+            const totalFiles = files.length;
+            
+            for (let i = 0; i < totalFiles; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        
+                        // 解析合同文件（每个sheet作为独立供应商）
+                        parseContractWorkbookBySheet(workbook, file.name);
+                        
+                        processedCount++;
+                        
+                        // 所有文件处理完成
+                        if (processedCount === totalFiles) {
+                            // 保存到本地存储
+                            saveToLocalStorage();
+                            
+                            // 更新UI
+                            updateContractList();
+                            updateGlobalStats();
+                            updateSupplierSelectionGrid();
+                            
+                            // 启用相关按钮
+                            nextToStep2Btn.disabled = false;
+                            clearContractsBtn.disabled = false;
+                            exportContractsBtn.disabled = false;
+                            
+                            showToast('success', `${totalFiles}个合同文件解析成功！`);
+                            loadingSpinner.style.display = 'none';
+                        }
+                    } catch (error) {
+                        showToast('error', `解析文件 ${file.name} 时出错: ${error.message}`);
+                        loadingSpinner.style.display = 'none';
+                    }
+                };
+                
+                reader.onerror = function() {
+                    showToast('error', `读取文件 ${file.name} 失败`);
+                    loadingSpinner.style.display = 'none';
+                };
+                
+                reader.readAsArrayBuffer(file);
+            }
+        }
+        
+        // 解析合同Excel文件（按sheet分供应商）
+        function parseContractWorkbookBySheet(workbook, fileName) {
+            // 遍历所有工作表，每个工作表代表一个供应商
+            workbook.SheetNames.forEach(sheetName => {
+                const supplierName = sheetName.trim();
+                
+                // 初始化供应商数据结构
+                if (!contracts[supplierName]) {
+                    contracts[supplierName] = {
+                        materials: {},
+                        contracts: {},
+                        fileName: fileName,
+                        sheetName: sheetName,
+                        lastUpdated: new Date().toISOString(),
+                        totalMaterialCount: 0 // 新增：供应商总物料数
+                    };
+                }
+                
+                const worksheet = workbook.Sheets[sheetName];
+                const data = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                
+                let currentContractNo = '';
+                
+                // 解析每一行数据（跳过表头行）
+                for (let i = 1; i < data.length; i++) {
+                    const row = data[i];
+                    
+                    // 跳过空行
+                    if (!row || row.length < 7) continue;
+                    
+                    // 获取合同编号（A列）
+                    const contractNo = row[0] ? String(row[0]).trim() : '';
+                    
+                    // 如果合同编号不为空，更新当前合同编号
+                    if (contractNo) {
+                        currentContractNo = contractNo;
+                        
+                        // 记录合同信息
+                        if (!contracts[supplierName].contracts[currentContractNo]) {
+                            contracts[supplierName].contracts[currentContractNo] = {
+                                count: 0,
+                                materials: [],
+                                date: contractNo.length === 8 ? formatContractDate(contractNo) : '未知日期'
+                            };
+                        }
+                    }
+                    
+                    // 获取其他数据
+                    const serialNo = row[1] ? String(row[1]).trim() : ''; // B列：序号
+                    const materialCode = row[2] ? String(row[2]).trim() : ''; // C列：物料编码
+                    const materialName = row[3] ? String(row[3]).trim() : ''; // D列：物料名称
+                    const unit = row[4] ? String(row[4]).trim() : ''; // E列：单位
+                    const taxExcludedPrice = row[5] ? parseFloat(row[5]) : 0; // F列：未税单价（保留4位小数）
+                    const taxIncludedPrice = row[6] ? parseFloat(row[6]) : 0; // G列：含税单价（保留2位小数）
+                    
+                    // 验证数据有效性
+                    if (materialCode && !isNaN(taxIncludedPrice)) {
+                        // 创建唯一的物料键，允许重复的物料编码
+                        const materialKey = `${materialCode}_${currentContractNo}_${serialNo}_${i}`;
+                        
+                        // 存储物料信息
+                        contracts[supplierName].materials[materialKey] = {
+                            materialCode: materialCode,
+                            materialName: materialName,
+                            unit: unit,
+                            taxExcludedPrice: taxExcludedPrice,
+                            taxIncludedPrice: taxIncludedPrice,
+                            contractNo: currentContractNo,
+                            serialNo: serialNo,
+                            contractInfo: currentContractNo ? `${currentContractNo}-${serialNo}` : `未知合同-${serialNo}`,
+                            supplier: supplierName,
+                            fileName: fileName,
+                            sheetName: sheetName
+                        };
+                        
+                        // 记录到合同统计
+                        if (currentContractNo) {
+                            contracts[supplierName].contracts[currentContractNo].count++;
+                            contracts[supplierName].contracts[currentContractNo].materials.push(materialKey);
+                        }
+                        
+                        // 累加供应商的总物料数（不去重）
+                        contracts[supplierName].totalMaterialCount++;
+                    }
+                }
+                
+                // 如果这个工作表没有数据，移除空供应商
+                if (contracts[supplierName].totalMaterialCount === 0) {
+                    delete contracts[supplierName];
+                }
+            });
+        }
+        
+        // 格式化合同日期
+        function formatContractDate(contractNo) {
+            if (contractNo.length === 8 && !isNaN(contractNo)) {
+                const year = contractNo.substring(0, 4);
+                const month = contractNo.substring(4, 6);
+                const day = contractNo.substring(6, 8);
+                return `${year}年${month}月${day}日`;
+            }
+            return contractNo;
+        }
+        
+        // 更新全局统计
+        function updateGlobalStats() {
+            let totalMaterials = 0;
+            let totalSuppliers = Object.keys(contracts).length;
+            let totalContracts = 0;
+            
+            for (const supplier in contracts) {
+                // 重新计算供应商的总物料数（通过累加所有合同的物料数）
+                let supplierMaterialCount = 0;
+                for (const contractNo in contracts[supplier].contracts) {
+                    supplierMaterialCount += contracts[supplier].contracts[contractNo].count;
+                }
+                
+                // 更新供应商的总物料数
+                contracts[supplier].totalMaterialCount = supplierMaterialCount;
+                totalMaterials += supplierMaterialCount;
+                totalContracts += Object.keys(contracts[supplier].contracts).length;
+            }
+            
+            totalMaterialsCountEl.textContent = totalMaterials;
+            totalSuppliersCountEl.textContent = totalSuppliers;
+            contractCountBadge.textContent = `${totalContracts}个合同`;
+            supplierCountBadge.textContent = `${totalSuppliers}个供应商`;
+        }
+        
+        // 更新供应商选择网格
+        function updateSupplierSelectionGrid() {
+            const grid = document.getElementById('supplierSelectionGrid');
+            grid.innerHTML = '';
+            
+            if (Object.keys(contracts).length === 0) {
+                grid.innerHTML = '<div class="col-12"><p class="text-muted text-center">暂无供应商数据</p></div>';
+                return;
+            }
+            
+            for (const supplier in contracts) {
+                const materialCount = contracts[supplier].totalMaterialCount || 0;
+                const contractCount = Object.keys(contracts[supplier].contracts).length;
+                
+                const col = document.createElement('div');
+                col.className = 'col-md-4';
+                
+                const card = document.createElement('div');
+                card.className = `supplier-select-card ${currentSupplier === supplier ? 'selected' : ''}`;
+                card.setAttribute('data-supplier', supplier);
+                
+                card.innerHTML = `
+                    <h5><i class="bi bi-building me-2"></i>${supplier}</h5>
+                    <div class="mb-2">
+                        <span class="badge-custom">${contractCount}个合同</span>
+                        <span class="badge-custom badge-success-custom">${materialCount}个物料</span>
+                    </div>
+                    <div class="text-muted small">
+                        <div><i class="bi bi-file-earmark me-1"></i> ${contracts[supplier].fileName}</div>
+                        <div><i class="bi bi-table me-1"></i> Sheet: ${contracts[supplier].sheetName}</div>
+                        <div><i class="bi bi-clock me-1"></i> ${formatDate(contracts[supplier].lastUpdated)}</div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => selectSupplier(supplier));
+                col.appendChild(card);
+                grid.appendChild(col);
+            }
+        }
+        
+        // 格式化日期
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('zh-CN');
+        }
+        
+        // 选择供应商
+        function selectSupplier(supplier) {
+            currentSupplier = supplier;
+            
+            // 更新供应商选择网格
+            document.querySelectorAll('.supplier-select-card').forEach(card => {
+                card.classList.remove('selected');
+                if (card.getAttribute('data-supplier') === supplier) {
+                    card.classList.add('selected');
+                }
+            });
+            
+            // 显示供应商详情
+            displaySelectedSupplierDetails(supplier);
+            
+            // 启用下一步按钮
+            nextToStep3Btn.disabled = false;
+        }
+        
+        // 显示已选择供应商详情
+        function displaySelectedSupplierDetails(supplier) {
+            const supplierData = contracts[supplier];
+            const contractCount = Object.keys(supplierData.contracts).length;
+            const materialCount = supplierData.totalMaterialCount || 0;
+            
+            selectedSupplierNameEl.textContent = supplier;
+            selectedContractCountEl.textContent = `${contractCount}个合同`;
+            selectedMaterialCountEl.textContent = `${materialCount}个物料`;
+            
+            // 更新合同列表
+            let contractsHtml = '';
+            for (const contractNo in supplierData.contracts) {
+                const contract = supplierData.contracts[contractNo];
+                contractsHtml += `
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>${contractNo}</span>
+                        <span class="badge bg-secondary">${contract.count}个物料</span>
+                    </div>
+                `;
+            }
+            
+            selectedContractListEl.innerHTML = contractsHtml || '<p class="text-muted mb-0">暂无合同信息</p>';
+            
+            // 显示详情区域
+            document.getElementById('selectedSupplierDetails').style.display = 'block';
+            
+            // 更新第三步的供应商信息
+            currentSupplierNameEl.textContent = supplier;
+            currentContractCountEl.textContent = contractCount;
+            currentMaterialCountEl.textContent = materialCount;
+        }
+        
+        // 处理对账单文件选择
+        function handleInvoiceFileSelect() {
+            const files = invoiceFileInput.files;
+            if (files.length === 0) return;
+            
+            const file = files[0];
+            
+            // 读取文件并统计物料数量
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const dataArray = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                    
+                    let totalInvoiceItems = 0;
+                    let validInvoiceItems = 0;
+                    
+                    // 统计所有物料数量（不去重）
+                    for (let i = 1; i < dataArray.length; i++) {
+                        const row = dataArray[i];
+                        if (!row || row.length < 9) continue;
+                        
+                        const materialCode = row[3] ? String(row[3]).trim() : '';
+                        const invoicePrice = row[7] ? parseFloat(row[7]) : 0;
+                        
+                        totalInvoiceItems++; // 统计所有行
+                        
+                        if (materialCode && !isNaN(invoicePrice)) {
+                            validInvoiceItems++; // 统计有效物料
+                        }
+                    }
+                    
+                    // 显示文件名和统计信息
+                    invoiceUploadArea.innerHTML = `
+                        <i class="bi bi-check-circle-fill" style="color: #27ae60;"></i>
+                        <h5 class="mt-3">${file.name}</h5>
+                        <p class="text-muted mb-1">文件大小：${(file.size / 1024).toFixed(2)} KB</p>
+                        <p class="text-muted mb-3">总行数：${totalInvoiceItems}，有效物料：${validInvoiceItems}</p>
+                        <button class="btn btn-outline-secondary" onclick="resetInvoiceUpload()">
+                            <i class="bi bi-x-circle me-2"></i>重新选择
+                        </button>
+                    `;
+                    
+                    // 存储有效物料数量
+                    invoiceFileInput.dataset.validItems = validInvoiceItems;
+                    
+                    // 启用开始核价按钮
+                    startVerifyBtn.disabled = false;
+                    
+                    // 更新预计匹配物料显示
+                    calculateVerificationStats();
+                    
+                } catch (error) {
+                    showToast('error', `解析对账单文件时出错: ${error.message}`);
+                    // 重置上传区域
+                    resetInvoiceUpload();
+                }
+            };
+            
+            reader.onerror = function() {
+                showToast('error', '读取对账单文件失败');
+                resetInvoiceUpload();
+            };
+            
+            reader.readAsArrayBuffer(file);
+        }
+        
+        // 重置对账单上传
+        function resetInvoiceUpload() {
+            invoiceFileInput.value = '';
+            invoiceUploadArea.innerHTML = `
+                <i class="bi bi-file-earmark-excel-fill" style="color: #27ae60;"></i>
+                <h5 class="mt-3">上传对账单Excel文件</h5>
+                <p class="text-muted mb-3">系统将自动核价并生成报告</p>
+                <button class="btn btn-success" id="invoiceFileBtn">
+                    <i class="bi bi-upload me-2"></i>选择对账单文件
+                </button>
+            `;
+            startVerifyBtn.disabled = true;
+        }
+        
+        // 计算核价统计
+        function calculateVerificationStats() {
+            // 获取对账单中的有效物料数量
+            const invoiceMaterialCount = parseInt(invoiceFileInput.dataset.validItems) || 0;
+            document.getElementById('expectedMatches').textContent = invoiceMaterialCount;
+            
+            // 简单估算核价时间（每100个物料约1秒）
+            const estimatedTime = Math.max(1, Math.ceil(invoiceMaterialCount / 100));
+            document.getElementById('verificationTime').textContent = `${estimatedTime}s`;
+        }
+        
+        // 开始核价
+        function startVerification() {
+            const files = invoiceFileInput.files;
+            if (files.length === 0 || !currentSupplier) {
+                showToast('error', '请先选择供应商并上传对账单');
+                return;
+            }
+            
+            loadingSpinner.style.display = 'block';
+            startVerifyBtn.disabled = true;
+            
+            const file = files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    
+                    // 解析对账单
+                    currentResults = parseInvoiceWorkbook(workbook);
+                    
+                    // 保存历史记录
+                    saveVerificationHistory(file.name);
+                    
+                    // 显示结果
+                    displayResults();
+                    
+                    // 进入第四步
+                    goToStep(4);
+                    
+                    showToast('success', '核价完成！');
+                } catch (error) {
+                    showToast('error', `核价失败: ${error.message}`);
+                } finally {
+                    loadingSpinner.style.display = 'none';
+                    startVerifyBtn.disabled = false;
+                }
+            };
+            
+            reader.onerror = function() {
+                showToast('error', '读取对账单文件失败');
+                loadingSpinner.style.display = 'none';
+                startVerifyBtn.disabled = false;
+            };
+            
+            reader.readAsArrayBuffer(file);
+        }
+        
+        // 解析对账单Excel文件（更新格式）
+        function parseInvoiceWorkbook(workbook) {
+            const results = [];
+            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+            const data = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+            
+            // 检查文件格式是否符合要求
+            if (data.length < 2 || data[0].length < 9) {
+                throw new Error('对账单格式不正确，请确保包含所有必需列');
+            }
+            
+            // 解析对账单数据
+            for (let i = 1; i < data.length; i++) {
+                const row = data[i];
+                
+                // 跳过空行
+                if (!row || row.length < 9) continue;
+                
+                // 根据新的对账单格式调整列索引
+                const serialNo = row[0] ? String(row[0]).trim() : ''; // A列：序号
+                const storageDate = row[1] ? row[1] : ''; // B列：入库日期
+                const storageNo = row[2] ? String(row[2]).trim() : ''; // C列：入库单号
+                const materialCode = row[3] ? String(row[3]).trim() : ''; // D列：物料编码
+                const materialName = row[4] ? String(row[4]).trim() : ''; // E列：物料名称
+                const quantity = row[5] ? parseFloat(row[5]) : 0; // F列：数量
+                const taxExcludedPrice = row[6] ? parseFloat(row[6]) : 0; // G列：未税单价（4位小数）
+                const invoicePrice = row[7] ? parseFloat(row[7]) : 0; // H列：含税单价（2位小数）
+                const totalAmount = row[8] ? parseFloat(row[8]) : 0; // I列：价税合计
+                
+                if (materialCode && !isNaN(invoicePrice)) {
+                    // 在供应商合同中查找物料
+                    const contractInfo = findContractInfo(materialCode);
+                    
+                    const result = {
+                        index: i,
+                        materialCode: materialCode,
+                        materialName: materialName,
+                        invoicePrice: invoicePrice,
+                        status: 'notfound',
+                        difference: 0,
+                        serialNo: serialNo,
+                        storageDate: storageDate,
+                        storageNo: storageNo,
+                        quantity: quantity,
+                        taxExcludedPrice: taxExcludedPrice,
+                        totalAmount: totalAmount
+                    };
+                    
+                    if (contractInfo) {
+                        result.contractPrice = contractInfo.taxIncludedPrice;
+                        result.contractInfo = contractInfo.contractInfo;
+                        result.supplier = contractInfo.supplier;
+                        result.contractNo = contractInfo.contractNo;
+                        result.contractSerialNo = contractInfo.serialNo;
+                        result.contractTaxExcludedPrice = contractInfo.taxExcludedPrice; // 未税单价（4位小数）
+                        result.difference = parseFloat((invoicePrice - contractInfo.taxIncludedPrice).toFixed(2));
+                        
+                        // 比较单价（允许0.01的误差）
+                        if (Math.abs(invoicePrice - contractInfo.taxIncludedPrice) < 0.01) {
+                            result.status = 'match';
+                        } else {
+                            result.status = 'mismatch';
+                        }
+                    } else {
+                        result.contractPrice = null;
+                        result.contractInfo = '未找到合同';
+                        result.supplier = currentSupplier;
+                        result.contractTaxExcludedPrice = null;
+                    }
+                    
+                    results.push(result);
+                }
+            }
+            
+            return results;
+        }
+        
+        // 在供应商合同中查找物料
+        function findContractInfo(materialCode) {
+            if (!contracts[currentSupplier]) return null;
+            
+            // 在供应商的所有物料中查找
+            for (const materialKey in contracts[currentSupplier].materials) {
+                const material = contracts[currentSupplier].materials[materialKey];
+                if (material.materialCode === materialCode) {
+                    return material;
+                }
+            }
+            
+            return null;
+        }
+        
+        // 显示核价结果
+        function displayResults() {
+            // 更新统计信息
+            const total = currentResults.length;
+            const match = currentResults.filter(r => r.status === 'match').length;
+            const mismatch = currentResults.filter(r => r.status === 'mismatch').length;
+            const notfound = currentResults.filter(r => r.status === 'notfound').length;
+            
+            totalCountEl.textContent = total;
+            matchCountEl.textContent = match;
+            mismatchCountEl.textContent = mismatch;
+            notfoundCountEl.textContent = notfound;
+            
+            // 显示结果区域
+            resultSummary.style.display = 'block';
+            
+            // 如果DataTables实例已存在，销毁它
+            if (dataTable) {
+                dataTable.destroy();
+            }
+            
+            // 准备表格数据
+            const tableData = currentResults.map(result => {
+                let statusText = '';
+                let statusClass = '';
+                
+                switch(result.status) {
+                    case 'match':
+                        statusText = '一致';
+                        statusClass = 'status-match';
+                        break;
+                    case 'mismatch':
+                        statusText = '不一致';
+                        statusClass = 'status-mismatch';
+                        break;
+                    case 'notfound':
+                        statusText = '未找到合同';
+                        statusClass = 'status-notfound';
+                        break;
+                }
+                
+                return [
+                    result.index,
+                    result.materialCode,
+                    result.materialName,
+                    result.invoicePrice.toFixed(2), // 含税单价保留2位小数
+                    result.contractPrice ? result.contractPrice.toFixed(2) : '-',
+                    result.contractInfo,
+                    `<span class="${statusClass}">${statusText}</span>`,
+                    result.difference !== 0 ? result.difference.toFixed(2) : '0.00',
+                    `<button class="btn btn-sm btn-outline-info" onclick="viewMaterialDetail('${result.materialCode}')">详情</button>`
+                ];
+            });
+            
+            // 初始化DataTables - 添加FixedHeader插件
+            dataTable = $('#resultTable').DataTable({
+                data: tableData,
+                columns: [
+                    { title: "序号" },
+                    { title: "物料编码" },
+                    { title: "物料名称" },
+                    { title: "对账单单价" },
+                    { title: "合同单价" },
+                    { title: "合同编号-序号" },
+                    { title: "核价结果" },
+                    { title: "差额" },
+                    { title: "操作" }
+                ],
+                pageLength: 50, // 默认显示50行
+                lengthMenu: [50, 100, 150, 200, 300], // 行数选项
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/zh-Hans.json"
+                },
+                dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+                buttons: [
+                    {
+                        extend: 'copy',
+                        text: '<i class="bi bi-files"></i> 复制',
+                        className: 'btn btn-secondary'
+                    },
+                    {
+                        extend: 'excel',
+                        text: '<i class="bi bi-file-earmark-excel"></i> Excel',
+                        className: 'btn btn-success',
+                        filename: '核价结果'
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="bi bi-file-earmark-pdf"></i> PDF',
+                        className: 'btn btn-danger',
+                        filename: '核价结果'
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="bi bi-printer"></i> 打印',
+                        className: 'btn btn-info'
+                    },
+                    {
+                        extend: 'colvis',
+                        text: '<i class="bi bi-columns-gap"></i> 列显示',
+                        className: 'btn btn-warning'
+                    }
+                ],
+                select: true,
+                responsive: true,
+                order: [[0, 'asc']],
+                scrollY: '500px', // 设置固定高度，启用垂直滚动
+                scrollCollapse: true,
+                // 启用FixedHeader插件
+                initComplete: function() {
+                    // 初始化FixedHeader插件
+                    new $.fn.dataTable.FixedHeader(this, {
+                        header: true,
+                        headerOffset: 0
+                    });
+                }
+            });
+            
+            // 显示导出按钮
+            exportButtons.style.display = 'flex';
+        }
+        
+        // 查看物料详情
+        function viewMaterialDetail(materialCode) {
+            // 首先在当前供应商中查找
+            let material = null;
+            let supplier = currentSupplier;
+            
+            // 在供应商的所有物料中查找第一个匹配的
+            if (contracts[currentSupplier]) {
+                for (const materialKey in contracts[currentSupplier].materials) {
+                    const mat = contracts[currentSupplier].materials[materialKey];
+                    if (mat.materialCode === materialCode) {
+                        material = mat;
+                        break;
+                    }
+                }
+            }
+            
+            // 如果没找到，在所有供应商中查找
+            if (!material) {
+                for (const supp in contracts) {
+                    for (const materialKey in contracts[supp].materials) {
+                        const mat = contracts[supp].materials[materialKey];
+                        if (mat.materialCode === materialCode) {
+                            material = mat;
+                            supplier = supp;
+                            break;
+                        }
+                    }
+                    if (material) break;
+                }
+            }
+            
+            if (!material) {
+                showToast('error', '未找到物料信息');
+                return;
+            }
+            
+            const detailHtml = `
+                <div class="modal fade material-detail-modal" id="materialDetailModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">物料详情</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th style="width: 30%">物料编码</th>
+                                        <td>${material.materialCode}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>物料名称</th>
+                                        <td>${material.materialName}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>供应商</th>
+                                        <td>${supplier}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>合同编号</th>
+                                        <td>${material.contractNo || '未知'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>合同序号</th>
+                                        <td>${material.serialNo || '未知'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>单位</th>
+                                        <td>${material.unit || '只'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>未税单价</th>
+                                        <td class="price-highlight">${material.taxExcludedPrice ? material.taxExcludedPrice.toFixed(4) : '0.0000'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>含税单价</th>
+                                        <td class="price-highlight">${material.taxIncludedPrice ? material.taxIncludedPrice.toFixed(2) : '0.00'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>合同信息</th>
+                                        <td>${material.contractInfo}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>来源文件</th>
+                                        <td>${material.fileName || '未知'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Sheet名称</th>
+                                        <td>${material.sheetName || '未知'}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 移除现有的模态框
+            const existingModal = document.getElementById('materialDetailModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // 添加新的模态框
+            document.body.insertAdjacentHTML('beforeend', detailHtml);
+            
+            // 显示模态框
+            const modal = new bootstrap.Modal(document.getElementById('materialDetailModal'));
+            modal.show();
+        }
+        
+        // 更新合同列表
+        function updateContractList() {
+            contractList.innerHTML = '';
+            
+            if (Object.keys(contracts).length === 0) {
+                contractList.innerHTML = '<p class="text-muted">暂无上传的合同文件</p>';
+                return;
+            }
+            
+            // 按文件名分组显示
+            const filesMap = {};
+            for (const supplier in contracts) {
+                const fileName = contracts[supplier].fileName;
+                if (!filesMap[fileName]) {
+                    filesMap[fileName] = [];
+                }
+                filesMap[fileName].push(supplier);
+            }
+            
+            for (const fileName in filesMap) {
+                const suppliers = filesMap[fileName];
+                const fileItem = document.createElement('div');
+                fileItem.className = 'contract-list-item mb-3';
+                fileItem.innerHTML = `
+                    <div class="mb-2">
+                        <h6 class="mb-1"><i class="bi bi-file-earmark me-2"></i>${fileName}</h6>
+                        <small class="text-muted">包含 ${suppliers.length} 个供应商</small>
+                    </div>
+                    <div class="ps-3">
+                        ${suppliers.map(supplier => {
+                            const materialCount = contracts[supplier].totalMaterialCount || 0;
+                            const contractCount = Object.keys(contracts[supplier].contracts).length;
+                            return `
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <i class="bi bi-building me-2"></i>${supplier}
+                                        <span class="badge-custom ms-2">${contractCount}个合同</span>
+                                        <span class="badge-custom badge-success-custom ms-1">${materialCount}个物料</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="removeSupplier('${supplier}')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+                contractList.appendChild(fileItem);
+            }
+        }
+        
+        // 移除供应商
+        function removeSupplier(supplier) {
+            if (confirm(`确定要移除供应商"${supplier}"的所有合同数据吗？`)) {
+                delete contracts[supplier];
+                saveToLocalStorage();
+                updateContractList();
+                updateGlobalStats();
+                updateSupplierSelectionGrid();
+                
+                if (currentSupplier === supplier) {
+                    currentSupplier = '';
+                    nextToStep3Btn.disabled = true;
+                    document.getElementById('selectedSupplierDetails').style.display = 'none';
+                }
+                
+                showToast('success', `已移除供应商"${supplier}"`);
+            }
+        }
+        
+        // 清除所有合同
+        function clearAllContracts() {
+            if (confirm('确定要清除所有合同数据吗？此操作不可恢复！')) {
+                contracts = {};
+                currentSupplier = '';
+                currentResults = [];
+                verificationHistory = [];
+                
+                if (dataTable) {
+                    dataTable.destroy();
+                    dataTable = null;
+                }
+                
+                if (allMaterialsTable) {
+                    allMaterialsTable.destroy();
+                    allMaterialsTable = null;
+                }
+                
+                localStorage.removeItem('materialContracts');
+                localStorage.removeItem('verificationHistory');
+                
+                // 重置UI
+                updateContractList();
+                updateGlobalStats();
+                updateSupplierSelectionGrid();
+                
+                // 禁用按钮
+                nextToStep2Btn.disabled = true;
+                clearContractsBtn.disabled = true;
+                exportContractsBtn.disabled = true;
+                nextToStep3Btn.disabled = true;
+                startVerifyBtn.disabled = true;
+                
+                // 隐藏详情区域
+                document.getElementById('selectedSupplierDetails').style.display = 'none';
+                
+                // 回到第一步
+                goToStep(1);
+                
+                // 重置文件输入
+                contractFileInput.value = '';
+                invoiceFileInput.value = '';
+                resetInvoiceUpload();
+                
+                showToast('success', '已清除所有合同数据');
+            }
+        }
+        
+        // 步骤导航函数
+        function goToStep(step) {
+            // 更新步骤指示器
+            step1.className = 'step';
+            step2.className = 'step';
+            step3.className = 'step';
+            step4.className = 'step';
+            
+            step1Container.style.display = 'none';
+            step2Container.style.display = 'none';
+            step3Container.style.display = 'none';
+            step4Container.style.display = 'none';
+            
+            switch(step) {
+                case 1:
+                    step1.className = 'step active';
+                    step1Container.style.display = 'block';
+                    break;
+                case 2:
+                    if (Object.keys(contracts).length === 0) {
+                        showToast('error', '请先上传合同文件');
+                        return;
+                    }
+                    step1.className = 'step completed';
+                    step2.className = 'step active';
+                    step2Container.style.display = 'block';
+                    break;
+                case 3:
+                    if (!currentSupplier) {
+                        showToast('error', '请先选择供应商');
+                        return;
+                    }
+                    step1.className = 'step completed';
+                    step2.className = 'step completed';
+                    step3.className = 'step active';
+                    step3Container.style.display = 'block';
+                    break;
+                case 4:
+                    if (currentResults.length === 0) {
+                        showToast('error', '请先完成核价');
+                        return;
+                    }
+                    step1.className = 'step completed';
+                    step2.className = 'step completed';
+                    step3.className = 'step completed';
+                    step4.className = 'step active';
+                    step4Container.style.display = 'block';
+                    break;
+            }
+            
+            // 更新导航链接激活状态
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (parseInt(link.getAttribute('data-step')) === step) {
+                    link.classList.add('active');
+                }
+            });
+        }
+        
+        // 开始新的核价任务
+        function newVerification() {
+            // 重置对账单相关数据
+            currentResults = [];
+            invoiceFileInput.value = '';
+            
+            // 重置第三步UI
+            resetInvoiceUpload();
+            
+            startVerifyBtn.disabled = true;
+            
+            // 回到第三步
+            goToStep(3);
+        }
+        
+        // 保存到本地存储
+        function saveToLocalStorage() {
+            const data = {
+                contracts: contracts,
+                currentSupplier: currentSupplier,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('materialContracts', JSON.stringify(data));
+        }
+        
+        // 从本地存储加载
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('materialContracts');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    contracts = data.contracts || {};
+                    currentSupplier = data.currentSupplier || '';
+                    
+                    // 更新UI
+                    updateContractList();
+                    updateGlobalStats();
+                    updateSupplierSelectionGrid();
+                    
+                    if (Object.keys(contracts).length > 0) {
+                        nextToStep2Btn.disabled = false;
+                        clearContractsBtn.disabled = false;
+                        exportContractsBtn.disabled = false;
+                        
+                        if (currentSupplier && contracts[currentSupplier]) {
+                            displaySelectedSupplierDetails(currentSupplier);
+                            nextToStep3Btn.disabled = false;
+                        }
+                        
+                        showToast('info', '已加载本地存储的合同数据');
+                    }
+                } catch (e) {
+                    console.error('加载本地存储数据失败:', e);
+                }
+            }
+            
+            // 加载历史记录
+            loadVerificationHistory();
+        }
+        
+        // 保存核价历史记录
+        function saveVerificationHistory(invoiceFileName) {
+            if (currentResults.length === 0) return;
+            
+            const historyItem = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                supplier: currentSupplier,
+                invoiceFile: invoiceFileName,
+                totalCount: currentResults.length,
+                matchCount: currentResults.filter(r => r.status === 'match').length,
+                mismatchCount: currentResults.filter(r => r.status === 'mismatch').length,
+                notfoundCount: currentResults.filter(r => r.status === 'notfound').length,
+                results: currentResults.map(r => ({
+                    materialCode: r.materialCode,
+                    materialName: r.materialName,
+                    invoicePrice: r.invoicePrice,
+                    contractPrice: r.contractPrice,
+                    contractInfo: r.contractInfo,
+                    status: r.status,
+                    difference: r.difference
+                }))
+            };
+            
+            // 加载现有历史记录
+            loadVerificationHistory();
+            
+            // 添加到历史记录数组开头
+            verificationHistory.unshift(historyItem);
+            
+            // 只保留最近50条记录
+            if (verificationHistory.length > 50) {
+                verificationHistory = verificationHistory.slice(0, 50);
+            }
+            
+            // 保存到本地存储
+            localStorage.setItem('verificationHistory', JSON.stringify(verificationHistory));
+            
+            // 显示成功消息
+            showToast('info', '核价记录已保存到历史');
+        }
+        
+        // 加载核价历史记录
+        function loadVerificationHistory() {
+            const saved = localStorage.getItem('verificationHistory');
+            if (saved) {
+                try {
+                    verificationHistory = JSON.parse(saved) || [];
+                } catch (e) {
+                    console.error('加载历史记录失败:', e);
+                    verificationHistory = [];
+                }
+            }
+        }
+        
+        // 显示历史记录
+        function showHistory() {
+            const historyList = document.getElementById('historyList');
+            
+            if (verificationHistory.length === 0) {
+                historyList.innerHTML = '<p class="text-muted text-center">暂无核价历史记录</p>';
+            } else {
+                historyList.innerHTML = '';
+                
+                verificationHistory.forEach(history => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = `history-item ${history.matchCount === history.totalCount ? 'match' : history.mismatchCount > 0 ? 'mismatch' : 'notfound'}`;
+                    
+                    const date = new Date(history.date);
+                    const dateStr = date.toLocaleString('zh-CN');
+                    
+                    historyItem.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0"><i class="bi bi-building me-2"></i>${history.supplier}</h6>
+                            <div>
+                                <button class="btn btn-sm btn-outline-info me-2" onclick="viewHistoryDetail(${history.id})">
+                                    <i class="bi bi-eye"></i> 查看详情
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteHistory(${history.id})">
+                                    <i class="bi bi-trash"></i> 删除
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <small class="text-muted"><i class="bi bi-file-earmark me-1"></i> ${history.invoiceFile}</small>
+                        </div>
+                        <div class="history-stats">
+                            <div class="history-stat">
+                                <div class="number">${history.totalCount}</div>
+                                <div class="label">总物料数</div>
+                            </div>
+                            <div class="history-stat">
+                                <div class="number status-match">${history.matchCount}</div>
+                                <div class="label">单价一致</div>
+                            </div>
+                            <div class="history-stat">
+                                <div class="number status-mismatch">${history.mismatchCount}</div>
+                                <div class="label">单价不一致</div>
+                            </div>
+                            <div class="history-stat">
+                                <div class="number status-notfound">${history.notfoundCount}</div>
+                                <div class="label">未找到合同</div>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted"><i class="bi bi-clock me-1"></i> ${dateStr}</small>
+                        </div>
+                    `;
+                    
+                    historyList.appendChild(historyItem);
+                });
+            }
+            
+            // 显示模态框
+            const modal = new bootstrap.Modal(document.getElementById('historyModal'));
+            modal.show();
+        }
+        
+        // 查看历史记录详情
+        function viewHistoryDetail(historyId) {
+            const history = verificationHistory.find(h => h.id === historyId);
+            if (!history) {
+                showToast('error', '未找到历史记录');
+                return;
+            }
+            
+            // 更新详情信息
+            document.getElementById('historySupplierName').textContent = history.supplier;
+            document.getElementById('historyVerificationDate').textContent = new Date(history.date).toLocaleString('zh-CN');
+            document.getElementById('historyInvoiceFile').textContent = history.invoiceFile;
+            
+            document.getElementById('historyTotalCount').textContent = history.totalCount;
+            document.getElementById('historyMatchCount').textContent = history.matchCount;
+            document.getElementById('historyMismatchCount').textContent = history.mismatchCount;
+            document.getElementById('historyNotfoundCount').textContent = history.notfoundCount;
+            
+            // 准备表格数据
+            const tableData = history.results.map(result => {
+                let statusText = '';
+                let statusClass = '';
+                
+                switch(result.status) {
+                    case 'match':
+                        statusText = '一致';
+                        statusClass = 'status-match';
+                        break;
+                    case 'mismatch':
+                        statusText = '不一致';
+                        statusClass = 'status-mismatch';
+                        break;
+                    case 'notfound':
+                        statusText = '未找到合同';
+                        statusClass = 'status-notfound';
+                        break;
+                }
+                
+                return [
+                    history.results.indexOf(result) + 1,
+                    result.materialCode,
+                    result.materialName,
+                    result.invoicePrice.toFixed(2),
+                    result.contractPrice ? result.contractPrice.toFixed(2) : '-',
+                    result.contractInfo,
+                    `<span class="${statusClass}">${statusText}</span>`,
+                    result.difference !== 0 ? result.difference.toFixed(2) : '0.00'
+                ];
+            });
+            
+            // 如果DataTables实例已存在，销毁它
+            let historyTable = $('#historyDetailTable').DataTable();
+            if (historyTable) {
+                historyTable.destroy();
+            }
+            
+            // 初始化DataTables
+            historyTable = $('#historyDetailTable').DataTable({
+                data: tableData,
+                columns: [
+                    { title: "序号" },
+                    { title: "物料编码" },
+                    { title: "物料名称" },
+                    { title: "对账单单价" },
+                    { title: "合同单价" },
+                    { title: "合同编号-序号" },
+                    { title: "核价结果" },
+                    { title: "差额" }
+                ],
+                pageLength: 25,
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/zh-Hans.json"
+                },
+                dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+                order: [[0, 'asc']],
+                scrollY: '400px',
+                scrollCollapse: true
+            });
+            
+            // 显示详情模态框
+            const modal = new bootstrap.Modal(document.getElementById('historyDetailModal'));
+            modal.show();
+        }
+        
+        // 删除历史记录
+        function deleteHistory(historyId) {
+            if (confirm('确定要删除这条历史记录吗？')) {
+                verificationHistory = verificationHistory.filter(h => h.id !== historyId);
+                localStorage.setItem('verificationHistory', JSON.stringify(verificationHistory));
+                showHistory();
+                showToast('success', '历史记录已删除');
+            }
+        }
+        
+        // 清空历史记录
+        function clearHistory() {
+            if (verificationHistory.length === 0) {
+                showToast('warning', '暂无历史记录可清空');
+                return;
+            }
+            
+            if (confirm('确定要清空所有历史记录吗？此操作不可恢复！')) {
+                verificationHistory = [];
+                localStorage.removeItem('verificationHistory');
+                showHistory();
+                showToast('success', '历史记录已清空');
+            }
+        }
+        
+        // 显示所有物料明细
+        function showAllMaterials() {
+            // 填充供应商选择下拉框
+            populateSupplierSelect();
+            
+            // 如果DataTables实例已存在，销毁它
+            if (allMaterialsTable) {
+                allMaterialsTable.destroy();
+            }
+            
+            // 初始化DataTables
+            allMaterialsTable = $('#allMaterialsTable').DataTable({
+                data: [],
+                columns: [
+                    { title: "物料编码" },
+                    { title: "物料名称" },
+                    { title: "供应商" },
+                    { title: "合同编号" },
+                    { title: "序号" },
+                    { title: "未税单价" },
+                    { title: "含税单价" },
+                    { title: "操作" }
+                ],
+                pageLength: 25,
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/zh-Hans.json"
+                },
+                dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+                order: [[0, 'asc']]
+            });
+            
+            // 显示模态框
+            const modal = new bootstrap.Modal(document.getElementById('allMaterialsModal'));
+            modal.show();
+        }
+        
+        // 填充供应商选择下拉框
+        function populateSupplierSelect() {
+            searchSupplierSelect.innerHTML = '<option value="">全部供应商</option>';
+            
+            for (const supplier in contracts) {
+                const option = document.createElement('option');
+                option.value = supplier;
+                option.textContent = supplier;
+                searchSupplierSelect.appendChild(option);
+            }
+        }
+        
+        // 搜索物料
+        function searchMaterials() {
+            const materialCode = searchMaterialCodeInput.value.trim().toLowerCase();
+            const materialName = searchMaterialNameInput.value.trim().toLowerCase();
+            const supplier = searchSupplierSelect.value;
+            
+            // 收集所有物料
+            const allMaterials = [];
+            let materialId = 1;
+            
+            for (const supp in contracts) {
+                // 如果指定了供应商且不匹配，跳过
+                if (supplier && supp !== supplier) {
+                    continue;
+                }
+                
+                for (const materialKey in contracts[supp].materials) {
+                    const material = contracts[supp].materials[materialKey];
+                    
+                    // 过滤条件
+                    if (materialCode && !material.materialCode.toLowerCase().includes(materialCode)) {
+                        continue;
+                    }
+                    
+                    if (materialName && !material.materialName.toLowerCase().includes(materialName)) {
+                        continue;
+                    }
+                    
+                    allMaterials.push({
+                        id: materialId++,
+                        materialCode: material.materialCode,
+                        materialName: material.materialName,
+                        supplier: material.supplier,
+                        contractNo: material.contractNo || '未知',
+                        serialNo: material.serialNo || '未知',
+                        taxExcludedPrice: material.taxExcludedPrice ? material.taxExcludedPrice.toFixed(4) : '0.0000',
+                        taxIncludedPrice: material.taxIncludedPrice ? material.taxIncludedPrice.toFixed(2) : '0.00',
+                        contractInfo: material.contractInfo
+                    });
+                }
+            }
+            
+            if (allMaterials.length === 0) {
+                showToast('warning', '未找到匹配的物料');
+            }
+            
+            // 准备表格数据
+            const tableData = allMaterials.map(material => {
+                return [
+                    material.materialCode,
+                    material.materialName,
+                    material.supplier,
+                    material.contractNo,
+                    material.serialNo,
+                    material.taxExcludedPrice,
+                    material.taxIncludedPrice,
+                    `<button class="btn btn-sm btn-outline-info" onclick="viewMaterialDetailFromAll('${material.materialCode}', '${material.supplier}')">详情</button>`
+                ];
+            });
+            
+            // 更新DataTables数据
+            allMaterialsTable.clear();
+            allMaterialsTable.rows.add(tableData);
+            allMaterialsTable.draw();
+        }
+        
+        // 清除搜索
+        function clearSearch() {
+            searchMaterialCodeInput.value = '';
+            searchMaterialNameInput.value = '';
+            searchSupplierSelect.value = '';
+            
+            // 重新搜索（显示所有物料）
+            searchMaterials();
+        }
+        
+        // 从所有物料中查看详情
+        function viewMaterialDetailFromAll(materialCode, supplier) {
+            const material = findMaterialInSupplier(materialCode, supplier);
+            if (!material) {
+                showToast('error', '未找到物料信息');
+                return;
+            }
+            
+            // 关闭所有物料模态框
+            bootstrap.Modal.getInstance(document.getElementById('allMaterialsModal')).hide();
+            
+            // 显示物料详情
+            const detailHtml = `
+                <div class="modal fade material-detail-modal" id="materialDetailModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">物料详情</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th style="width: 30%">物料编码</th>
+                                        <td>${material.materialCode}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>物料名称</th>
+                                        <td>${material.materialName}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>供应商</th>
+                                        <td>${supplier}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>合同编号</th>
+                                        <td>${material.contractNo || '未知'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>合同序号</th>
+                                        <td>${material.serialNo || '未知'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>单位</th>
+                                        <td>${material.unit || '只'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>未税单价</th>
+                                        <td class="price-highlight">${material.taxExcludedPrice ? material.taxExcludedPrice.toFixed(4) : '0.0000'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>含税单价</th>
+                                        <td class="price-highlight">${material.taxIncludedPrice ? material.taxIncludedPrice.toFixed(2) : '0.00'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>合同信息</th>
+                                        <td>${material.contractInfo}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>来源文件</th>
+                                        <td>${material.fileName || '未知'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Sheet名称</th>
+                                        <td>${material.sheetName || '未知'}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 移除现有的模态框
+            const existingModal = document.getElementById('materialDetailModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // 添加新的模态框
+            document.body.insertAdjacentHTML('beforeend', detailHtml);
+            
+            // 显示模态框
+            const modal = new bootstrap.Modal(document.getElementById('materialDetailModal'));
+            modal.show();
+        }
+        
+        // 在指定供应商中查找物料
+        function findMaterialInSupplier(materialCode, supplier) {
+            if (!contracts[supplier]) return null;
+            
+            for (const materialKey in contracts[supplier].materials) {
+                const material = contracts[supplier].materials[materialKey];
+                if (material.materialCode === materialCode) {
+                    return material;
+                }
+            }
+            
+            return null;
+        }
+        
+        // 显示合同统计
+        function showContractStats() {
+            if (Object.keys(contracts).length === 0) {
+                showToast('warning', '暂无合同数据');
+                return;
+            }
+            
+            // 更新统计信息
+            const totalSuppliers = Object.keys(contracts).length;
+            let totalContracts = 0;
+            let totalMaterials = 0;
+            
+            const supplierStats = [];
+            
+            for (const supplier in contracts) {
+                const contractCount = Object.keys(contracts[supplier].contracts).length;
+                const materialCount = contracts[supplier].totalMaterialCount || 0;
+                
+                totalContracts += contractCount;
+                totalMaterials += materialCount;
+                
+                // 计算价格范围
+                let minPrice = Infinity;
+                let maxPrice = 0;
+                
+                for (const materialKey in contracts[supplier].materials) {
+                    const price = contracts[supplier].materials[materialKey].taxIncludedPrice;
+                    if (price < minPrice) minPrice = price;
+                    if (price > maxPrice) maxPrice = price;
+                }
+                
+                supplierStats.push({
+                    name: supplier,
+                    contractCount: contractCount,
+                    materialCount: materialCount,
+                    minPrice: minPrice === Infinity ? 0 : minPrice.toFixed(2),
+                    maxPrice: maxPrice.toFixed(2)
+                });
+            }
+            
+            document.getElementById('statsTotalSuppliers').textContent = totalSuppliers;
+            document.getElementById('statsTotalContracts').textContent = totalContracts;
+            
+            // 更新供应商详情表格
+            const statsBody = document.getElementById('supplierStatsBody');
+            statsBody.innerHTML = '';
+            
+            supplierStats.forEach(stat => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${stat.name}</td>
+                    <td>${stat.contractCount}</td>
+                    <td>${stat.materialCount}</td>
+                    <td>${stat.minPrice} - ${stat.maxPrice}</td>
+                `;
+                statsBody.appendChild(row);
+            });
+            
+            // 创建图表
+            createSupplierChart(supplierStats);
+            
+            // 显示模态框
+            const modal = new bootstrap.Modal(document.getElementById('contractStatsModal'));
+            modal.show();
+        }
+        
+        // 创建供应商图表
+        function createSupplierChart(supplierStats) {
+            const ctx = document.getElementById('supplierChart').getContext('2d');
+            
+            // 如果已有图表，销毁它
+            if (supplierChart) {
+                supplierChart.destroy();
+            }
+            
+            // 准备图表数据
+            const labels = supplierStats.map(stat => stat.name);
+            const materialData = supplierStats.map(stat => stat.materialCount);
+            const contractData = supplierStats.map(stat => stat.contractCount);
+            
+            supplierChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '物料数量',
+                            data: materialData,
+                            backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                            borderColor: 'rgba(52, 152, 219, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '合同数量',
+                            data: contractData,
+                            backgroundColor: 'rgba(39, 174, 96, 0.7)',
+                            borderColor: 'rgba(39, 174, 96, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '数量'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '供应商'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: '各供应商物料与合同数量对比'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 显示快速操作菜单
+        function showQuickActions() {
+            const modal = new bootstrap.Modal(document.getElementById('quickActionsModal'));
+            modal.show();
+        }
+        
+        // 导出到Excel - 修复居中问题
+        function exportToExcel() {
+            if (currentResults.length === 0) {
+                showToast('error', '没有可导出的数据');
+                return;
+            }
+            
+            // 准备数据
+            const exportData = [
+                ['序号', '物料编码', '物料名称', '对账单单价(2位小数)', '合同单价(2位小数)', '合同编号-序号', '核价结果', '差额(2位小数)', '供应商']
+            ];
+            
+            currentResults.forEach(result => {
+                let statusText = '';
+                switch(result.status) {
+                    case 'match': statusText = '一致'; break;
+                    case 'mismatch': statusText = '不一致'; break;
+                    case 'notfound': statusText = '未找到合同'; break;
+                }
+                
+                exportData.push([
+                    result.index,
+                    result.materialCode,
+                    result.materialName,
+                    result.invoicePrice.toFixed(2),
+                    result.contractPrice ? result.contractPrice.toFixed(2) : '-',
+                    result.contractInfo,
+                    statusText,
+                    result.difference.toFixed(2),
+                    result.supplier
+                ]);
+            });
+            
+            // 添加统计信息
+            const total = currentResults.length;
+            const match = currentResults.filter(r => r.status === 'match').length;
+            const mismatch = currentResults.filter(r => r.status === 'mismatch').length;
+            const notfound = currentResults.filter(r => r.status === 'notfound').length;
+            
+            exportData.push([]);
+            exportData.push(['统计信息', '', '', '', '', '', '', '', '']);
+            exportData.push(['总物料数', total, '', '', '', '', '', '', '']);
+            exportData.push(['单价一致', match, '', '', '', '', '', '', '']);
+            exportData.push(['单价不一致', mismatch, '', '', '', '', '', '', '']);
+            exportData.push(['未找到合同', notfound, '', '', '', '', '', '', '']);
+            
+            // 创建Excel工作表
+            const worksheet = XLSX.utils.aoa_to_sheet(exportData);
+            
+            // 设置列宽
+            const wscols = [
+                {wch: 8},   // 序号
+                {wch: 15},  // 物料编码
+                {wch: 25},  // 物料名称
+                {wch: 15},  // 对账单单价
+                {wch: 15},  // 合同单价
+                {wch: 20},  // 合同编号-序号
+                {wch: 12},  // 核价结果
+                {wch: 12},  // 差额
+                {wch: 15}   // 供应商
+            ];
+            worksheet['!cols'] = wscols;
+            
+            // 修复：设置所有单元格居中
+            const range = XLSX.utils.decode_range(worksheet['!ref']);
+            for (let row = range.s.r; row <= range.e.r; row++) {
+                for (let col = range.s.c; col <= range.e.c; col++) {
+                    const cell_address = XLSX.utils.encode_cell({r: row, c: col});
+                    if (!worksheet[cell_address]) continue;
+                    
+                    // 确保单元格样式对象存在
+                    if (!worksheet[cell_address].s) {
+                        worksheet[cell_address].s = {};
+                    }
+                    
+                    // 设置水平垂直居中
+                    worksheet[cell_address].s.alignment = {
+                        horizontal: 'center',
+                        vertical: 'center'
+                    };
+                    
+                    // 设置数值格式
+                    if (col === 3 || col === 4 || col === 7) { // 单价和差额列
+                        worksheet[cell_address].s.numFmt = '0.00';
+                    }
+                }
+            }
+            
+            // 特别设置表头样式
+            for (let col = range.s.c; col <= range.e.c; col++) {
+                const cell_address = XLSX.utils.encode_cell({r: 0, c: col});
+                if (worksheet[cell_address]) {
+                    if (!worksheet[cell_address].s) {
+                        worksheet[cell_address].s = {};
+                    }
+                    worksheet[cell_address].s.font = { bold: true, sz: 12 };
+                    worksheet[cell_address].s.fill = { fgColor: { rgb: "3498DB" }, patternType: "solid" };
+                    worksheet[cell_address].s.alignment = { horizontal: 'center', vertical: 'center' };
+                }
+            }
+            
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, '核价结果');
+            
+            // 导出文件
+            const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            XLSX.writeFile(workbook, `物料核价结果_${currentSupplier}_${date}.xlsx`);
+            
+            showToast('success', 'Excel文件已生成');
+        }
+        
+        // 导出横向Excel（详细报表）- 修复居中问题
+        function exportToExcelHorizontal() {
+            if (currentResults.length === 0) {
+                showToast('error', '没有可导出的数据');
+                return;
+            }
+            
+            // 准备数据
+            const exportData = [
+                ['序号', '物料编码', '物料名称', '对账单单价', '合同单价', '合同编号-序号', '核价结果', '差额', '供应商', '入库日期', '入库单号', '数量', '价税合计']
+            ];
+            
+            currentResults.forEach(result => {
+                let statusText = '';
+                switch(result.status) {
+                    case 'match': statusText = '一致'; break;
+                    case 'mismatch': statusText = '不一致'; break;
+                    case 'notfound': statusText = '未找到合同'; break;
+                }
+                
+                exportData.push([
+                    result.index,
+                    result.materialCode,
+                    result.materialName,
+                    result.invoicePrice.toFixed(2),
+                    result.contractPrice ? result.contractPrice.toFixed(2) : '-',
+                    result.contractInfo,
+                    statusText,
+                    result.difference.toFixed(2),
+                    result.supplier,
+                    result.storageDate,
+                    result.storageNo,
+                    result.quantity,
+                    result.totalAmount ? result.totalAmount.toFixed(2) : '-'
+                ]);
+            });
+            
+            // 添加统计信息
+            const total = currentResults.length;
+            const match = currentResults.filter(r => r.status === 'match').length;
+            const mismatch = currentResults.filter(r => r.status === 'mismatch').length;
+            const notfound = currentResults.filter(r => r.status === 'notfound').length;
+            
+            exportData.push([]);
+            exportData.push(['统计信息', '', '', '', '', '', '', '', '', '', '', '', '']);
+            exportData.push(['总物料数', total, '', '', '', '', '', '', '', '', '', '', '']);
+            exportData.push(['单价一致', match, '', '', '', '', '', '', '', '', '', '', '']);
+            exportData.push(['单价不一致', mismatch, '', '', '', '', '', '', '', '', '', '', '']);
+            exportData.push(['未找到合同', notfound, '', '', '', '', '', '', '', '', '', '', '']);
+            
+            // 创建Excel工作表
+            const worksheet = XLSX.utils.aoa_to_sheet(exportData);
+            
+            // 设置列宽
+            const wscols = [
+                {wch: 8},   // 序号
+                {wch: 20},  // 物料编码
+                {wch: 30},  // 物料名称
+                {wch: 12},  // 对账单单价
+                {wch: 12},  // 合同单价
+                {wch: 20},  // 合同编号-序号
+                {wch: 10},  // 核价结果
+                {wch: 10},  // 差额
+                {wch: 20},  // 供应商
+                {wch: 15},  // 入库日期
+                {wch: 15},  // 入库单号
+                {wch: 10},  // 数量
+                {wch: 15}   // 价税合计
+            ];
+            worksheet['!cols'] = wscols;
+            
+            // 修复：设置所有单元格居中
+            const range = XLSX.utils.decode_range(worksheet['!ref']);
+            for (let row = range.s.r; row <= range.e.r; row++) {
+                for (let col = range.s.c; col <= range.e.c; col++) {
+                    const cell_address = XLSX.utils.encode_cell({r: row, c: col});
+                    if (!worksheet[cell_address]) continue;
+                    
+                    // 确保单元格样式对象存在
+                    if (!worksheet[cell_address].s) {
+                        worksheet[cell_address].s = {};
+                    }
+                    
+                    // 设置水平垂直居中
+                    worksheet[cell_address].s.alignment = {
+                        horizontal: 'center',
+                        vertical: 'center'
+                    };
+                    
+                    // 设置数值格式
+                    if (col === 3 || col === 4 || col === 7 || col === 12) { // 单价、差额、金额列
+                        worksheet[cell_address].s.numFmt = '0.00';
+                    }
+                }
+            }
+            
+            // 特别设置表头样式
+            for (let col = range.s.c; col <= range.e.c; col++) {
+                const cell_address = XLSX.utils.encode_cell({r: 0, c: col});
+                if (worksheet[cell_address]) {
+                    if (!worksheet[cell_address].s) {
+                        worksheet[cell_address].s = {};
+                    }
+                    worksheet[cell_address].s.font = { bold: true, sz: 12 };
+                    worksheet[cell_address].s.fill = { fgColor: { rgb: "3498DB" }, patternType: "solid" };
+                    worksheet[cell_address].s.alignment = { horizontal: 'center', vertical: 'center' };
+                }
+            }
+            
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, '核价结果');
+            
+            // 导出文件
+            const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            XLSX.writeFile(workbook, `物料核价横向报表_${currentSupplier}_${date}.xlsx`);
+            
+            showToast('success', '横向Excel文件已生成');
+        }
+        
+        // 导出汇总报告Excel - 修复居中问题
+        function exportSummaryExcel() {
+            if (currentResults.length === 0) {
+                showToast('error', '没有可导出的数据');
+                return;
+            }
+            
+            const workbook = XLSX.utils.book_new();
+            
+            // 第一个工作表：统计信息
+            const total = currentResults.length;
+            const match = currentResults.filter(r => r.status === 'match').length;
+            const mismatch = currentResults.filter(r => r.status === 'mismatch').length;
+            const notfound = currentResults.filter(r => r.status === 'notfound').length;
+            
+            const statsData = [
+                ['物料核价汇总报告'],
+                [''],
+                ['供应商:', currentSupplier],
+                ['核价日期:', new Date().toLocaleDateString('zh-CN')],
+                [''],
+                ['项目', '数量', '占比'],
+                ['总物料数', total, '100%'],
+                ['单价一致', match, `${((match/total)*100).toFixed(2)}%`],
+                ['单价不一致', mismatch, `${((mismatch/total)*100).toFixed(2)}%`],
+                ['未找到合同', notfound, `${((notfound/total)*100).toFixed(2)}%`]
+            ];
+            
+            const statsSheet = XLSX.utils.aoa_to_sheet(statsData);
+            
+            // 设置第一行标题合并居中
+            statsSheet['!merges'] = [
+                {s: {r: 0, c: 0}, e: {r: 0, c: 2}} // 合并A1到C1
+            ];
+            
+            // 设置标题样式
+            const titleCell = statsSheet['A1'];
+            if (titleCell) {
+                titleCell.s = {
+                    font: {sz: 16, bold: true, color: {rgb: "2C3E50"}},
+                    alignment: {horizontal: 'center', vertical: 'center'}
+                };
+            }
+            
+            // 修复：设置所有单元格居中
+            const statsRange = XLSX.utils.decode_range(statsSheet['!ref']);
+            for (let row = statsRange.s.r; row <= statsRange.e.r; row++) {
+                for (let col = statsRange.s.c; col <= statsRange.e.c; col++) {
+                    const cellAddress = XLSX.utils.encode_cell({r: row, c: col});
+                    if (!statsSheet[cellAddress]) continue;
+                    
+                    // 确保单元格样式对象存在
+                    if (!statsSheet[cellAddress].s) {
+                        statsSheet[cellAddress].s = {};
+                    }
+                    
+                    // 设置水平垂直居中
+                    statsSheet[cellAddress].s.alignment = {
+                        horizontal: 'center',
+                        vertical: 'center'
+                    };
+                    
+                    // 设置表头样式（第6行）
+                    if (row === 5) {
+                        statsSheet[cellAddress].s.font = {bold: true, color: {rgb: "FFFFFF"}};
+                        statsSheet[cellAddress].s.fill = {fgColor: {rgb: "3498DB"}, patternType: "solid"};
+                    }
+                    
+                    // 设置百分比列样式（C列，第7-10行）
+                    if (col === 2 && row >= 6 && row <= 9) {
+                        statsSheet[cellAddress].s.numFmt = '0.00%';
+                    }
+                }
+            }
+            
+            XLSX.utils.book_append_sheet(workbook, statsSheet, '统计信息');
+            
+            // 第二个工作表：问题物料列表
+            const problemMaterials = currentResults.filter(r => r.status !== 'match');
+            if (problemMaterials.length > 0) {
+                const problemData = [
+                    ['物料编码', '物料名称', '问题类型', '对账单单价', '合同单价', '差额', '合同信息']
+                ];
+                
+                problemMaterials.forEach(result => {
+                    let statusText = '';
+                    switch(result.status) {
+                        case 'mismatch': statusText = '单价不一致'; break;
+                        case 'notfound': statusText = '未找到合同'; break;
+                    }
+                    
+                    problemData.push([
+                        result.materialCode,
+                        result.materialName,
+                        statusText,
+                        result.invoicePrice.toFixed(2),
+                        result.contractPrice ? result.contractPrice.toFixed(2) : '-',
+                        result.difference !== 0 ? result.difference.toFixed(2) : '-',
+                        result.contractInfo
+                    ]);
+                });
+                
+                const problemSheet = XLSX.utils.aoa_to_sheet(problemData);
+                
+                // 设置列宽
+                problemSheet['!cols'] = [
+                    {wch: 20},  // 物料编码
+                    {wch: 30},  // 物料名称
+                    {wch: 12},  // 问题类型
+                    {wch: 12},  // 对账单单价
+                    {wch: 12},  // 合同单价
+                    {wch: 10},  // 差额
+                    {wch: 25}   // 合同信息
+                ];
+                
+                // 修复：设置所有单元格居中
+                const problemRange = XLSX.utils.decode_range(problemSheet['!ref']);
+                for (let row = problemRange.s.r; row <= problemRange.e.r; row++) {
+                    for (let col = problemRange.s.c; col <= problemRange.e.c; col++) {
+                        const cellAddress = XLSX.utils.encode_cell({r: row, c: col});
+                        if (!problemSheet[cellAddress]) continue;
+                        
+                        // 确保单元格样式对象存在
+                        if (!problemSheet[cellAddress].s) {
+                            problemSheet[cellAddress].s = {};
+                        }
+                        
+                        // 设置水平垂直居中
+                        problemSheet[cellAddress].s.alignment = {
+                            horizontal: 'center',
+                            vertical: 'center'
+                        };
+                        
+                        // 设置表头样式
+                        if (row === 0) {
+                            problemSheet[cellAddress].s.font = {bold: true, color: {rgb: "FFFFFF"}};
+                            problemSheet[cellAddress].s.fill = {fgColor: {rgb: "E74C3C"}, patternType: "solid"};
+                        }
+                        
+                        // 设置数值格式
+                        if (col === 3 || col === 4 || col === 5) { // 单价和差额列
+                            problemSheet[cellAddress].s.numFmt = '0.00';
+                        }
+                    }
+                }
+                
+                XLSX.utils.book_append_sheet(workbook, problemSheet, '问题物料');
+            }
+            
+            // 导出文件
+            const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            XLSX.writeFile(workbook, `核价汇总报告_${currentSupplier}_${date}.xlsx`);
+            
+            showToast('success', '汇总报告Excel已生成');
+        }
+        
+        // 显示添加供应商合同模态框
+        function showAddSupplierContractModal() {
+            const modal = new bootstrap.Modal(document.getElementById('addSupplierContractModal'));
+            document.getElementById('supplierNameInput').value = '';
+            document.getElementById('contractFileSelect').value = '';
+            modal.show();
+        }
+        
+        // 显示导出合同模态框
+        function showExportContractsModal() {
+            if (Object.keys(contracts).length === 0) {
+                showToast('warning', '暂无合同数据可导出');
+                return;
+            }
+            
+            // 填充供应商选择下拉框
+            const supplierSelect = document.getElementById('singleSupplierSelect');
+            supplierSelect.innerHTML = '<option value="">请选择供应商</option>';
+            for (const supplier in contracts) {
+                const option = document.createElement('option');
+                option.value = supplier;
+                option.textContent = supplier;
+                supplierSelect.appendChild(option);
+            }
+            
+            // 填充供应商列表
+            const supplierList = document.getElementById('exportSupplierList');
+            supplierList.innerHTML = '';
+            for (const supplier in contracts) {
+                const materialCount = contracts[supplier].totalMaterialCount || 0;
+                const listItem = document.createElement('div');
+                listItem.className = 'list-group-item';
+                listItem.innerHTML = `
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="${supplier}" id="export_${supplier}">
+                        <label class="form-check-label" for="export_${supplier}">
+                            ${supplier} <span class="badge bg-secondary ms-2">${materialCount}个物料</span>
+                        </label>
+                    </div>
+                `;
+                supplierList.appendChild(listItem);
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('exportContractsModal'));
+            modal.show();
+        }
+        
+        // 处理导出选项变化
+        function handleExportOptionChange(e) {
+            const exportAll = document.getElementById('exportAll');
+            const exportSelected = document.getElementById('exportSelected');
+            const exportSingle = document.getElementById('exportSingle');
+            
+            document.getElementById('supplierSelectionExport').style.display = 'none';
+            document.getElementById('singleSupplierExport').style.display = 'none';
+            
+            if (exportSelected.checked) {
+                document.getElementById('supplierSelectionExport').style.display = 'block';
+            } else if (exportSingle.checked) {
+                document.getElementById('singleSupplierExport').style.display = 'block';
+            }
+        }
+        
+        // 处理添加供应商合同
+        function handleAddSupplierContract() {
+            const supplierName = document.getElementById('supplierNameInput').value.trim();
+            const fileInput = document.getElementById('contractFileSelect');
+            
+            if (!supplierName) {
+                showToast('error', '请输入供应商名称');
+                return;
+            }
+            
+            if (fileInput.files.length === 0) {
+                showToast('error', '请选择合同文件');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    
+                    // 解析合同文件 - 使用新的解析函数
+                    parseContractWorkbookBySheet(workbook, file.name);
+                    
+                    // 保存到本地存储
+                    saveToLocalStorage();
+                    
+                    // 更新UI
+                    updateContractList();
+                    updateGlobalStats();
+                    updateSupplierSelectionGrid();
+                    
+                    // 启用导出按钮
+                    exportContractsBtn.disabled = false;
+                    
+                    bootstrap.Modal.getInstance(document.getElementById('addSupplierContractModal')).hide();
+                    showToast('success', `供应商"${supplierName}"合同添加成功！`);
+                } catch (error) {
+                    showToast('error', `解析合同文件时出错: ${error.message}`);
+                }
+            };
+            
+            reader.onerror = function() {
+                showToast('error', '读取合同文件失败');
+            };
+            
+            reader.readAsArrayBuffer(file);
+        }
+        
+        // 处理导出合同
+        function handleExportContracts() {
+            const exportAll = document.getElementById('exportAll').checked;
+            const exportSelected = document.getElementById('exportSelected').checked;
+            const exportSingle = document.getElementById('exportSingle').checked;
+            
+            let suppliersToExport = [];
+            
+            if (exportAll) {
+                suppliersToExport = Object.keys(contracts);
+            } else if (exportSelected) {
+                const checkboxes = document.querySelectorAll('#exportSupplierList input[type="checkbox"]:checked');
+                checkboxes.forEach(cb => {
+                    suppliersToExport.push(cb.value);
+                });
+                
+                if (suppliersToExport.length === 0) {
+                    showToast('error', '请至少选择一个供应商');
+                    return;
+                }
+            } else if (exportSingle) {
+                const selectedSupplier = document.getElementById('singleSupplierSelect').value;
+                if (!selectedSupplier) {
+                    showToast('error', '请选择一个供应商');
+                    return;
+                }
+                suppliersToExport = [selectedSupplier];
+            }
+            
+            exportContractsToExcel(suppliersToExport);
+            bootstrap.Modal.getInstance(document.getElementById('exportContractsModal')).hide();
+        }
+        
+        // 导出合同到Excel - 修复居中问题
+        function exportContractsToExcel(suppliers) {
+            if (suppliers.length === 0) {
+                showToast('error', '没有可导出的数据');
+                return;
+            }
+            
+            // 创建工作簿
+            const workbook = XLSX.utils.book_new();
+            
+            suppliers.forEach(supplier => {
+                const supplierData = contracts[supplier];
+                if (!supplierData) return;
+                
+                // 准备数据
+                const exportData = [];
+                
+                // 表头
+                exportData.push(['合同编号', '序号', '物料编码', '物料名称', '单位', '未税单价(4位小数)', '含税单价(2位小数)']);
+                
+                // 按合同编号和序号排序
+                const materialsArray = Object.values(supplierData.materials);
+                materialsArray.sort((a, b) => {
+                    if (a.contractNo !== b.contractNo) {
+                        return (a.contractNo || '').localeCompare(b.contractNo || '');
+                    }
+                    return parseInt(a.serialNo || 0) - parseInt(b.serialNo || 0);
+                });
+                
+                // 添加数据行
+                materialsArray.forEach(material => {
+                    exportData.push([
+                        material.contractNo || '',
+                        material.serialNo || '',
+                        material.materialCode,
+                        material.materialName,
+                        material.unit || '只',
+                        material.taxExcludedPrice || 0,
+                        material.taxIncludedPrice || 0
+                    ]);
+                });
+                
+                // 创建工作表
+                const worksheet = XLSX.utils.aoa_to_sheet(exportData);
+                
+                // 设置列宽
+                const wscols = [
+                    {wch: 15}, // 合同编号
+                    {wch: 10}, // 序号
+                    {wch: 20}, // 物料编码
+                    {wch: 30}, // 物料名称
+                    {wch: 10}, // 单位
+                    {wch: 15}, // 未税单价
+                    {wch: 15}  // 含税单价
+                ];
+                worksheet['!cols'] = wscols;
+                
+                // 修复：设置所有单元格居中
+                const range = XLSX.utils.decode_range(worksheet['!ref']);
+                for (let row = range.s.r; row <= range.e.r; row++) {
+                    for (let col = range.s.c; col <= range.e.c; col++) {
+                        const cell_address = XLSX.utils.encode_cell({r: row, c: col});
+                        if (!worksheet[cell_address]) continue;
+                        
+                        // 确保单元格样式对象存在
+                        if (!worksheet[cell_address].s) {
+                            worksheet[cell_address].s = {};
+                        }
+                        
+                        // 设置水平垂直居中
+                        worksheet[cell_address].s.alignment = {
+                            horizontal: 'center',
+                            vertical: 'center'
+                        };
+                        
+                        // 设置数值格式
+                        if (col === 5) { // 未税单价列（4位小数）
+                            worksheet[cell_address].s.numFmt = '0.0000';
+                        } else if (col === 6) { // 含税单价列（2位小数）
+                            worksheet[cell_address].s.numFmt = '0.00';
+                        }
+                    }
+                }
+                
+                // 特别设置表头样式
+                for (let col = range.s.c; col <= range.e.c; col++) {
+                    const cell_address = XLSX.utils.encode_cell({r: 0, c: col});
+                    if (worksheet[cell_address]) {
+                        if (!worksheet[cell_address].s) {
+                            worksheet[cell_address].s = {};
+                        }
+                        worksheet[cell_address].s.font = { bold: true, sz: 12 };
+                        worksheet[cell_address].s.fill = { fgColor: { rgb: "3498DB" }, patternType: "solid" };
+                        worksheet[cell_address].s.alignment = { horizontal: 'center', vertical: 'center' };
+                    }
+                }
+                
+                // 添加工作表到工作簿
+                XLSX.utils.book_append_sheet(workbook, worksheet, supplier);
+            });
+            
+            // 导出文件
+            const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            const filename = suppliers.length === 1 ? 
+                `合同数据_${suppliers[0]}_${date}.xlsx` : 
+                `合同数据_${date}.xlsx`;
+            
+            XLSX.writeFile(workbook, filename);
+            
+            showToast('success', '合同数据导出成功！');
+        }
+        
+        // 显示消息提示
+        function showToast(type, message) {
+            const toastContainer = document.querySelector('.toast-container');
+            
+            const toastId = 'toast-' + Date.now();
+            const toastHtml = `
+                <div id="${toastId}" class="toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : type === 'warning' ? 'warning' : 'info'} border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="bi ${type === 'success' ? 'bi-check-circle' : type === 'error' ? 'bi-exclamation-circle' : type === 'warning' ? 'bi-exclamation-triangle' : 'bi-info-circle'} me-2"></i>
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+            
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement, {
+                autohide: true,
+                delay: 3000
+            });
+            
+            toast.show();
+            
+            // 自动移除
+            toastElement.addEventListener('hidden.bs.toast', function () {
+                toastElement.remove();
+            });
+        }
+    </script>
+</body>
+</html>
